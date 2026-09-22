@@ -1,5 +1,11 @@
 import {item} from "./items.js";
 export const RECIPES=[
+{id:"rope",name:"Lif İpi",description:"Lifleri bükerek bağlama ipi yap. Daha gelişmiş tariflerin temel malzemesi.",ingredients:{fiber:3},result:"rope",amount:1},
+{id:"wheat_seed",name:"Buğday Tohumu Ayırma",description:"Yabani sapları ayıklayıp gerçek buğday tohumu elde et.",ingredients:{reed:2,fiber:1},result:"wheat_seed",amount:2},
+{id:"watering_can",name:"Basit Sulama Kabı",description:"İlk tarlalarını daha düzenli sulamanı sağlayan basit bir kap.",ingredients:{stone:2,branch:2,fiber:2},result:"watering_can",amount:1},
+{id:"storage_chest",name:"Tahta Sandık",description:"Köyde kalıcı bir depolama noktası kurmak için hazırlanmış sandık.",ingredients:{wood:6,branch:4,rope:1},result:"storage_chest",amount:1},
+{id:"dried_herb",name:"Kurutulmuş Ot",description:"Yabani otları kurutarak uzun süre saklanabilir bir yiyecek hazırla.",ingredients:{fiber:3,reed:2},result:"dried_herb",amount:1},
+{id:"energy_potion",name:"Yankı Tonici",description:"Astral Tozu çok az miktarda kullanarak enerji taşıyan deneysel içecek.",ingredients:{astral_dust:1,reed:2},result:"potion",amount:1},
 {id:"crude_tool",name:"İlk Yontu",description:"Taşı şekillendirip lifle bağla. Basit kaynakları daha verimli toplar.",ingredients:{stone:2,fiber:2,branch:2},result:"crude_tool",amount:1},
 {id:"hand_axe",name:"Lif Bağlı Keski",description:"Odunsu kaynaklardan daha fazla malzeme çıkarır.",ingredients:{stone:1,fiber:3,branch:3},result:"hand_axe",amount:1},
 {id:"reed_seed",name:"Tohum Ayıklama",description:"Yabani saplardan ekilebilir bir çekirdek ayır.",ingredients:{reed:3,fiber:1},result:"reed_seed",amount:1},
