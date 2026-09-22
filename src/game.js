@@ -24,7 +24,7 @@ export class Game{
   addEventListener("keydown",e=>this.onKey(e));
   addEventListener("keyup",e=>this.keys.delete(e.key.toLowerCase()));
   canvas.addEventListener("mousemove",e=>{this.mouse.x=e.clientX;this.mouse.y=e.clientY});
-  canvas.addEventListener("mousedown",e=>{if(e.button===0)this.mouse.down=true});
+  canvas.addEventListener("mousedown",e=>{if(e.button===0){this.mouse.down=true;this.player.attack()}});
   addEventListener("mouseup",e=>{if(e.button===0)this.mouse.down=false});
 
   this.world=new World();
