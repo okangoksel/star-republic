@@ -1,9 +1,9 @@
-import {item} from "./items.js";
+import {item} from "./items.js";import {NPCS,nearestNPC,drawNPC} from "./npcs.js";import {Marketplace} from "./marketplace.js";
 const ENEMIES=["zombie","fast_zombie","miner_zombie"];
 export class Systems{
- constructor(game){this.game=game;this.enemies=[];this.particles=[];this.lastSpawn=0;this.farmSlots=[];this.initFarm()}
+ constructor(game){this.game=game;this.enemies=[];this.particles=[];this.lastSpawn=0;this.farmSlots=[];this.market=new Marketplace(game);this.initFarm()}
  initFarm(){for(let y=250;y<490;y+=48)for(let x=185;x<570;x+=48)this.farmSlots.push({x,y,state:"empty",growth:0,watered:false})}
- update(dt){
+ update(dt){this.market.refresh();
   this.game.world.update(dt);this.lastSpawn+=dt;
   if(!this.game.world.isNight())this.game.player.energy=Math.min(this.game.player.maxEnergy,this.game.player.energy+dt*1.2);
   for(const crop of this.farmSlots)if(crop.state==="growing"&&crop.watered){crop.growth+=dt;if(crop.growth>=15){crop.state="ready";crop.watered=false}}
@@ -21,7 +21,7 @@ export class Systems{
   if(best){best.hp-=dmg;this.particles.push({x:best.x,y:best.y,text:"-"+dmg,life:.6});if(best.hp<=0){this.game.player.addItem("stone",1+Math.floor(Math.random()*2));this.game.player.gainXp(25);this.particles.push({x:best.x,y:best.y,text:"+Taş",life:1});this.enemies.splice(this.enemies.indexOf(best),1);this.game.ui.toast("Tehdit dağıldı. Bir şeyler topladın.")}}
  }
  interact(){
-  const p=this.game.player;let near=null,dist=999;
+  const p=this.game.player;const npc=nearestNPC(p);if(npc){this.game.ui.npc(npc);return}let near=null,dist=999;
   for(const r of this.game.world.resources){const d=Math.hypot(p.x-r.x,p.y-r.y);if(d<45&&d<dist){near=r;dist=d}}
   if(near){this.gather(near);return}
   if(this.game.world.inFarm(p.x,p.y)){const slot=this.farmSlots.find(s=>Math.hypot(s.x-p.x,s.y-p.y)<30);if(!slot)return;
@@ -44,7 +44,7 @@ export class Systems{
   this.game.ui.toast(item(id).name+" topladın.");
  }
  render(c){
-  c.save();c.translate(this.game.world.screenOffsetX,this.game.world.screenOffsetY);
+  c.save();c.translate(this.game.world.screenOffsetX,this.game.world.screenOffsetY);for(const n of NPCS)drawNPC(c,n);c.fillStyle="#f6d36b";c.font="bold 12px system-ui";for(const n of NPCS)c.fillText(n.name,n.x-22,n.y-34);
   for(const s of this.farmSlots){c.fillStyle="#765337";c.fillRect(s.x-18,s.y-18,36,36);if(s.state==="growing"){c.fillStyle="#5fae52";const h=8+Math.min(18,s.growth);c.fillRect(s.x-3,s.y+7-h,6,h)}if(s.state==="ready"){c.fillStyle="#d8b94e";c.fillRect(s.x-7,s.y-13,14,22)}}
   for(const e of this.enemies){c.fillStyle="#4a8a52";c.fillRect(e.x-12,e.y-12,24,24);c.fillStyle="#111";c.fillRect(e.x-7,e.y-4,4,4);c.fillRect(e.x+3,e.y-4,4,4);c.fillStyle="#8b2d2d";c.fillRect(e.x-12,e.y-19,24,4)}
   for(const q of this.particles){c.fillStyle="#fff";c.font="bold 14px system-ui";c.fillText(q.text,q.x,q.y-(1-q.life)*35)}
