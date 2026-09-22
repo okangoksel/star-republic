@@ -8,6 +8,7 @@ const FALLBACK = {
   hand_axe:{name:"Lif Bağlı Keski",type:"tool",rarity:"Common",icon:"🪓"},
   stone_club:{name:"Yontma Sopa",type:"weapon",rarity:"Common",damage:9,icon:"🪵"},
   reed:{name:"Yabani Sap",type:"material",rarity:"Common",sellPrice:4,icon:"🌾"},
+  astral_dust:{name:"Astral Tozu",type:"material",rarity:"Rare",sellPrice:20,icon:"✦"},
   wheat:{name:"Buğday",type:"crop",rarity:"Common",sellPrice:8,icon:"🌾"},
   wheat_seed:{name:"Buğday Tohumu",type:"seed",rarity:"Common",sellPrice:2,icon:"🌱"},
   wood:{name:"Odun",type:"material",rarity:"Common",sellPrice:3,icon:"🪵"},
