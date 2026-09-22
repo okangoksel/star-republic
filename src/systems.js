@@ -37,20 +37,20 @@ export class Systems{
   }
  }
  gather(r){
-  const p=this.game.player;if(p.energy<2){this.game.ui.toast("Enerjin az.");return}
+  const p=this.game.player;const tool=p.equipment.tool;const cost=tool==="crude_tool"?1.5:tool==="hand_axe"?1.25:2;if(p.energy<cost){this.game.ui.toast("Enerjin az.");return}
   let id="stone",gain=1;
-  if(r.type==="branch"){id="branch";gain=1+(Math.random()<.35?1:0)}
+  if(r.type==="branch"){id="branch";gain=1+(Math.random()<.35?1:0)+(tool==="hand_axe"?1:0)}
   if(r.type==="fiber"){id="fiber";gain=1}
   if(r.type==="reed"){id="reed";gain=1}
   if(r.type==="bloom"){id="astral_dust";gain=1}
-  if(r.type==="rock"){id=Math.random()<.18?"flint":"stone";gain=1}
+  if(r.type==="rock"){id=Math.random()<.18?"flint":"stone";gain=tool==="crude_tool"?2:1}
   p.addItem(id,gain);
   const resonanceGain=r.type==="bloom"?12:(r.type==="rock"?2:1);
   p.resonance=Math.min(100,p.resonance+resonanceGain);
   if(r.type==="bloom"){p.discoveries.bloom=true;this.game.world.echoLevel=Math.max(this.game.world.echoLevel,1);this.game.ui.toast("Astral Bloom keşfedildi: dünya senden bir şey saklıyor.")}
   if(p.resonance>=25&&!p.discoveries.resonanceSense){p.discoveries.resonanceSense=true;this.game.ui.toast("Yeni keşif: Yankı Duyusu. Bazı kaynaklar artık farklı davranabilir.")}
   if(p.resonance>=60&&!p.discoveries.echoMap){p.discoveries.echoMap=true;this.game.world.echoLevel=2;this.game.ui.toast("Yeni keşif: Yankı Haritası. Dünyanın izleri güçleniyor.")}
-  p.energy=Math.max(0,p.energy-2);p.gainXp(4);
+  p.energy=Math.max(0,p.energy-cost);p.gainXp(tool?5:4);
   r.hp--;if(r.hp<=0)this.game.world.resources.splice(this.game.world.resources.indexOf(r),1);
   this.game.ui.toast(item(id).name+" topladın.");
  }
