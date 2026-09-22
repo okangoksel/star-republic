@@ -45,4 +45,19 @@ export class UI{
  setMenu(show){this.$("menu").classList.toggle("hidden",!show)}
  updateDebug(){this.$("debug").classList.toggle("hidden",!this.game.debug)}
  renderDebug(){this.$("debug").innerHTML="FPS: "+Math.round(this.game.fps)+"<br>POS: "+Math.round(this.game.player.x)+", "+Math.round(this.game.player.y)+"<br>TIME: "+this.clock(this.game.world.time)+"<br>DAY: "+this.game.world.day+"<br>ENEMIES: "+this.game.systems.enemies.length+"<br>HP: "+Math.ceil(this.game.player.hp)+"<br>ENERGY: "+Math.ceil(this.game.player.energy)+"<br>GOLD: "+this.game.player.gold}
-}
+}  renderInventory(){
+  const el=this.$("inventory"),p=this.game.player,entries=p.inventoryApi.entries().sort((a,b)=>a.data.type.localeCompare(b.data.type,"tr")||a.data.name.localeCompare(b.data.name,"tr"));
+  el.innerHTML='<div class="modal-card inventory-card"><div class="inv-title"><h2>Çanta</h2><span class="close">I / Kapat</span></div><p class="muted">Eşyayı sürükleyip başka bir yuvaya bırak. Üstüne tıklarsan açıklamasını görürsün.</p><div class="inventory-tools"><button id="sort-inventory">↕ Düzenle</button></div><div class="inventory-grid">'+Array.from({length:24},(_,i)=>{const e=entries[i];return '<div class="inv-slot" draggable="'+(!!e)+'" data-slot="'+i+'" '+(e?'data-item="'+e.id+'"':'')+'>'+(e?'<span class="inv-icon">'+e.data.icon+'</span><b>'+e.data.name+'</b><span class="qty">x'+e.qty+'</span>':'')+'</div>'}).join("")+'</div><p>💰 '+p.gold+' · Alet: '+(p.equipment.tool?item(p.equipment.tool).name:"Yok")+'</p></div>';
+  let dragId=null;
+  el.querySelectorAll(".inv-slot[draggable=true]").forEach(slot=>{
+    slot.addEventListener("dragstart",e=>{dragId=slot.dataset.item;slot.classList.add("dragging");e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",dragId)});
+    slot.addEventListener("dragend",()=>slot.classList.remove("dragging"));
+    slot.addEventListener("dragover",e=>{e.preventDefault();slot.classList.add("drag-over")});
+    slot.addEventListener("dragleave",()=>slot.classList.remove("drag-over"));
+    slot.addEventListener("drop",e=>{e.preventDefault();slot.classList.remove("drag-over");const target=slot.dataset.item;if(dragId&&dragId!==target){p.inventoryApi.move(dragId,target||"__empty__");if(target==="__empty__"){const q=p.inventoryApi.count("__empty__");if(q){p.inventoryApi.remove("__empty__",q);p.inventory[dragId]=q}}this.renderInventory();this.game.save()}});
+    slot.addEventListener("click",()=>{const d=item(slot.dataset.item);this.toast(d.name+" · "+(d.type==="tool"?"Alet":d.type==="seed"?"Tohum":d.type==="crop"?"Ürün":d.type==="material"?"Malzeme":"Eşya")+(d.sellPrice?" · Satış: "+d.sellPrice+" altın":""))});
+  });
+  const sortBtn=el.querySelector("#sort-inventory");if(sortBtn)sortBtn.onclick=()=>this.renderInventory();
+  el.onclick=e=>{if(e.target.classList.contains("close")||e.target===el)el.classList.add("hidden")}
+ }
+
