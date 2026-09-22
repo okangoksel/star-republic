@@ -32,10 +32,15 @@ export class Systems{
   if(Math.hypot(p.x-1610,p.y-650)<75){this.exploreMine();return}
   if(Math.hypot(p.x-1400,p.y-500)<75){this.exploreGrove();return}
   if(this.game.world.inFarm(p.x,p.y)){const slot=this.farmSlots.find(s=>Math.hypot(s.x-p.x,s.y-p.y)<30);if(!slot)return;
-   if(slot.state==="ready"){p.addItem("reed",2);p.gainXp(18);slot.state="empty";slot.growth=0;this.game.ui.toast("Yabani ürün toplandı.")}
-   else if(slot.state==="growing"&&!slot.watered&&p.energy>=2){slot.watered=true;p.energy-=2;this.game.ui.toast("Toprak canlandı.")}
-   else if(slot.state==="empty"&&p.removeItem("reed_seed",1)&&p.energy>=2){slot.state="growing";slot.growth=0;slot.watered=true;p.energy-=2;p.gainXp(5);this.game.ui.toast("İlk ekimin başladı.")}
-   else this.game.ui.toast("Burada henüz yapabileceğin bir şey yok.")
+   if(slot.state==="ready"){
+     const out={wheat:"wheat",carrot:"carrot",potato:"potato",tomato:"tomato",corn:"corn"}[slot.crop]||"wheat";
+     p.addItem(out,2);p.gainXp(18);slot.state="empty";slot.growth=0;slot.watered=false;slot.seed=null;slot.crop=null;this.game.ui.toast(item(out).name+" hasat edildi.");
+   }else if(slot.state==="growing"&&!slot.watered&&p.energy>=2){slot.watered=true;p.energy-=2;this.game.ui.toast("Toprak canlandı.")}
+   else if(slot.state==="empty"){
+     const seeds=["wheat_seed","carrot_seed","potato_seed","tomato_seed","corn_seed","reed_seed"].filter(id=>(p.inventory[id]||0)>0);
+     if(!seeds.length){this.game.ui.toast("Önce bir tohum bul veya üret. Çantayı I ile aç.");return}
+     const seed=seeds[0];if(p.removeItem(seed,1)&&p.energy>=2){slot.state="growing";slot.growth=0;slot.watered=true;slot.seed=seed;slot.crop={wheat_seed:"wheat",reed_seed:"wheat",carrot_seed:"carrot",potato_seed:"potato",tomato_seed:"tomato",corn_seed:"corn"}[seed];p.energy-=2;p.gainXp(5);this.game.ui.toast(item(seed).name+" ekildi.");}
+   }else this.game.ui.toast("Bu tarla karesi hazır değil.")
   }
  }
  exploreMine(){
