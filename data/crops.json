@@ -1,0 +1,3 @@
+{
+  "wheat":{"name":"Buğday","seed":"wheat_seed","growthSeconds":45,"harvest":"wheat","sellPrice":8,"energy":5}
+}
