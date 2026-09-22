@@ -1,0 +1,5 @@
+{
+  "zombie":{"name":"Zombie","hp":35,"speed":65,"damage":7,"xp":25,"gold":5},
+  "fast_zombie":{"name":"Hızlı Zombie","hp":24,"speed":95,"damage":6,"xp":30,"gold":7},
+  "miner_zombie":{"name":"Madenci Zombie","hp":55,"speed":50,"damage":9,"xp":40,"gold":10}
+}
