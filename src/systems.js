@@ -34,7 +34,7 @@ export class Systems{
  gather(r){
   const p=this.game.player;if(p.energy<2){this.game.ui.toast("Enerjin az.");return}
   let id="stone",gain=1;
-  if(r.type==="branch"){id="branch";gain=1+Math.random()<.35?1:0}
+  if(r.type==="branch"){id="branch";gain=1+(Math.random()<.35?1:0)}
   if(r.type==="fiber"){id="fiber";gain=1}
   if(r.type==="reed"){id="reed";gain=1}
   if(r.type==="rock"){id=Math.random()<.18?"flint":"stone";gain=1}
