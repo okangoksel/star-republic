@@ -29,6 +29,8 @@ export class Systems{
   const p=this.game.player;const npc=nearestNPC(p);if(npc){this.game.ui.npc(npc);return}let near=null,dist=999;
   for(const r of this.game.world.resources){const d=Math.hypot(p.x-r.x,p.y-r.y);if(d<45&&d<dist){near=r;dist=d}}
   if(near){this.gather(near);return}
+  if(Math.hypot(p.x-1610,p.y-650)<75){this.exploreMine();return}
+  if(Math.hypot(p.x-1400,p.y-500)<75){this.exploreGrove();return}
   if(this.game.world.inFarm(p.x,p.y)){const slot=this.farmSlots.find(s=>Math.hypot(s.x-p.x,s.y-p.y)<30);if(!slot)return;
    if(slot.state==="ready"){p.addItem("reed",2);p.gainXp(18);slot.state="empty";slot.growth=0;this.game.ui.toast("Yabani ürün toplandı.")}
    else if(slot.state==="growing"&&!slot.watered&&p.energy>=2){slot.watered=true;p.energy-=2;this.game.ui.toast("Toprak canlandı.")}
@@ -36,7 +38,19 @@ export class Systems{
    else this.game.ui.toast("Burada henüz yapabileceğin bir şey yok.")
   }
  }
- gather(r){
+ exploreMine(){
+  const p=this.game.player,w=this.game.world;if(p.energy<8){this.game.ui.toast("Madene girmek için daha fazla enerji gerekiyor.");return}
+  const depth=Math.min(3,(w.mineDepth||0)+1);w.mineDepth=depth;p.energy-=8;
+  const stone=2+depth;p.addItem("stone",stone);if(Math.random()<0.35+depth*.1)p.addItem("iron",1);if(Math.random()<0.25)p.addItem("flint",1);
+  p.gainXp(12+depth*3);this.game.ui.toast("Maden yankısı: "+stone+" taş topladın. Derinlik "+depth+"/3");
+  if(depth===3&&!p.discoveries.deepMine){p.discoveries.deepMine=true;this.game.ui.toast("Keşif: Madenin altında daha eski bir damar var.")}this.game.save();
+}
+exploreGrove(){
+  const p=this.game.player;if(p.energy<5){this.game.ui.toast("Koruyu incelemek için enerji gerekiyor.");return}
+  p.energy-=5;p.addItem("wood",1+Math.floor(Math.random()*2));p.addItem("fiber",1);if(Math.random()<.25)p.addItem("reed",1);p.gainXp(8);
+  if(!p.discoveries.grove){p.discoveries.grove=true;this.game.ui.toast("Keşif: Eski Korunun içinde düzenli büyüyen yabani bitkiler var.")}else this.game.ui.toast("Korudan kullanılabilir malzeme buldun.");this.game.save();
+}
+gather(r){
   const p=this.game.player;const tool=p.equipment.tool;const cost=tool==="crude_tool"?1.5:tool==="hand_axe"?1.25:2;if(p.energy<cost){this.game.ui.toast("Enerjin az.");return}
   let id="stone",gain=1;
   if(r.type==="branch"){id="branch";gain=1+(Math.random()<.35?1:0)+(tool==="hand_axe"?1:0)}
