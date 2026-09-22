@@ -37,8 +37,9 @@ export class Systems{
   if(r.type==="branch"){id="branch";gain=1+(Math.random()<.35?1:0)}
   if(r.type==="fiber"){id="fiber";gain=1}
   if(r.type==="reed"){id="reed";gain=1}
+  if(r.type==="bloom"){id="astral_dust";gain=1}
   if(r.type==="rock"){id=Math.random()<.18?"flint":"stone";gain=1}
-  p.addItem(id,gain);p.energy=Math.max(0,p.energy-2);p.gainXp(4);
+  p.addItem(id,gain);if(r.type==="bloom"){p.discoveries.bloom=true;this.game.ui.toast("Astral Bloom keşfedildi: dünya senden bir şey saklıyor.")}p.energy=Math.max(0,p.energy-2);p.gainXp(4);
   r.hp--;if(r.hp<=0)this.game.world.resources.splice(this.game.world.resources.indexOf(r),1);
   this.game.ui.toast(item(id).name+" topladın.");
  }
