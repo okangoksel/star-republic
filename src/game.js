@@ -19,7 +19,7 @@ export class Game{
   if(k==="f3"){this.debug=!this.debug;this.ui.updateDebug();return}
   if(k==="escape"){this.paused=!this.paused;this.ui.setMenu(this.paused);return}
   if(k==="i"){this.ui.toggleInventory();return}
-  if(k==="c"){this.ui.toggleCrafting();return}
+  if(k==="c"){this.ui.toggleCrafting();return}if(k==="m"){this.ui.toggleMarketplace();return}
   if(k>="1"&&k<="9")this.player.hotbar=Number(k)-1;
   if(k==="e")this.systems.interact();
  }
