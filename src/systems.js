@@ -6,7 +6,12 @@ export class Systems{
  update(dt){this.market.refresh();
   this.game.world.update(dt);this.lastSpawn+=dt;
   if(!this.game.world.isNight())this.game.player.energy=Math.min(this.game.player.maxEnergy,this.game.player.energy+dt*1.2);
-  for(const crop of this.farmSlots)if(crop.state==="growing"&&crop.watered){crop.growth+=dt;if(crop.growth>=15){crop.state="ready";crop.watered=false}}
+  for(const crop of this.farmSlots){
+    if(crop.state==="growing"){
+      if(this.game.world.weather==="rain")crop.watered=true;
+      if(crop.watered){crop.growth+=dt*(this.game.world.weather==="rain"?1.35:1);if(crop.growth>=15){crop.state="ready";crop.watered=false}}
+    }
+  }
   if(this.game.world.isNight()&&this.lastSpawn>3.8&&this.enemies.length<12){this.spawnZombie();this.lastSpawn=0}
   for(const e of this.enemies){const p=this.game.player,dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy)||1;if(d<500){e.x+=dx/d*e.speed*dt;e.y+=dy/d*e.speed*dt}if(d<28&&e.cd<=0){p.hp=Math.max(0,p.hp-e.damage);e.cd=1;this.game.ui.toast("Dikkat!");if(p.hp<=0){p.hp=p.maxHp;p.energy=Math.max(0,p.energy-25);p.x=390;p.y=360;this.game.ui.toast("Bayıldın! Eve döndün.")}}e.cd=Math.max(0,e.cd-dt)}
   this.particles=this.particles.filter(x=>(x.life-=dt)>0);
@@ -39,7 +44,13 @@ export class Systems{
   if(r.type==="reed"){id="reed";gain=1}
   if(r.type==="bloom"){id="astral_dust";gain=1}
   if(r.type==="rock"){id=Math.random()<.18?"flint":"stone";gain=1}
-  p.addItem(id,gain);if(r.type==="bloom"){p.discoveries.bloom=true;this.game.ui.toast("Astral Bloom keşfedildi: dünya senden bir şey saklıyor.")}p.energy=Math.max(0,p.energy-2);p.gainXp(4);
+  p.addItem(id,gain);
+  const resonanceGain=r.type==="bloom"?12:(r.type==="rock"?2:1);
+  p.resonance=Math.min(100,p.resonance+resonanceGain);
+  if(r.type==="bloom"){p.discoveries.bloom=true;this.game.world.echoLevel=Math.max(this.game.world.echoLevel,1);this.game.ui.toast("Astral Bloom keşfedildi: dünya senden bir şey saklıyor.")}
+  if(p.resonance>=25&&!p.discoveries.resonanceSense){p.discoveries.resonanceSense=true;this.game.ui.toast("Yeni keşif: Yankı Duyusu. Bazı kaynaklar artık farklı davranabilir.")}
+  if(p.resonance>=60&&!p.discoveries.echoMap){p.discoveries.echoMap=true;this.game.world.echoLevel=2;this.game.ui.toast("Yeni keşif: Yankı Haritası. Dünyanın izleri güçleniyor.")}
+  p.energy=Math.max(0,p.energy-2);p.gainXp(4);
   r.hp--;if(r.hp<=0)this.game.world.resources.splice(this.game.world.resources.indexOf(r),1);
   this.game.ui.toast(item(id).name+" topladın.");
  }
