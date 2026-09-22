@@ -1,0 +1,8 @@
+{
+  "wheat_seed":{"name":"Buğday Tohumu","type":"seed","rarity":"Common","sellPrice":2,"stackable":true},
+  "wheat":{"name":"Buğday","type":"crop","rarity":"Common","sellPrice":8,"stackable":true},
+  "wood":{"name":"Odun","type":"material","rarity":"Common","sellPrice":3,"stackable":true},
+  "stone":{"name":"Taş","type":"material","rarity":"Common","sellPrice":2,"stackable":true},
+  "iron":{"name":"Demir","type":"material","rarity":"Uncommon","sellPrice":12,"stackable":true},
+  "potion":{"name":"Enerji İksiri","type":"food","rarity":"Uncommon","sellPrice":15,"stackable":true}
+}
