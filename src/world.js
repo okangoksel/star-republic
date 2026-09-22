@@ -1,5 +1,5 @@
 export class World{
- constructor(){this.width=1800;this.height=1100;this.time=6*60;this.day=1;this.screenOffsetX=0;this.screenOffsetY=0;this.farm={x:120,y:170,w:520,h:390};this.resources=[];this.weather="clear";this.weatherTimer=0;this.echoLevel=0;this.makeWorld()}
+ constructor(){this.width=1800;this.height=1100;this.time=6*60;this.day=1;this.screenOffsetX=0;this.screenOffsetY=0;this.farm={x:120,y:170,w:520,h:390};this.resources=[];this.weather="clear";this.weatherTimer=0;this.echoLevel=0;this.mineDepth=0;this.makeWorld()}
  makeWorld(){
   const types=["branch","fiber","rock","reed"];
   const starter=[["branch",335,315],["branch",465,320],["fiber",300,365],["fiber",500,365],["rock",350,425],["rock",455,430],["reed",280,470],["reed",525,465]];
@@ -35,7 +35,7 @@ regrowResources(){
   c.fillStyle="#c7a66e";c.fillRect(760,420,430,90);c.fillRect(920,300,90,310);
   c.fillStyle="#d6bc83";c.fillRect(1080,90,580,300);
   // mine region
-  c.fillStyle="#686866";c.fillRect(1500,420,220,500);c.fillStyle="#25292e";c.fillRect(1530,450,160,440);
+  c.fillStyle="#686866";c.fillRect(1500,420,220,500);c.fillStyle="#25292e";c.fillRect(1530,450,160,440);c.fillStyle="#3a302b";c.fillRect(1570,625,80,55);c.fillStyle="#1c2025";c.fillRect(1582,637,56,43);
   // farm
   c.fillStyle="#6b4b33";c.fillRect(this.farm.x,this.farm.y,this.farm.w,this.farm.h);
   c.fillStyle="#9a7249";c.fillRect(150,210,430,300);
@@ -43,12 +43,12 @@ regrowResources(){
   // paths + simple original buildings
   c.fillStyle="#8b6547";c.fillRect(300,170,170,34);
   c.fillStyle="#b26d4c";c.fillRect(330,135,110,65);c.fillStyle="#5b3940";c.fillRect(320,128,130,18);c.fillStyle="#e6cf9d";c.fillRect(370,166,28,34);
-  c.fillStyle="#8c5b3e";c.fillRect(1130,150,120,90);c.fillStyle="#5d3e35";c.fillRect(1120,140,140,20);c.fillStyle="#d5bb7b";c.fillRect(1175,190,28,50);
+  c.fillStyle="#6d8a4f";c.fillRect(1360,475,90,55);c.fillStyle="#5a3b29";c.fillRect(1400,470,10,55);c.fillStyle="#83a75a";c.fillRect(1370,450,70,30);c.fillStyle="#8c5b3e";c.fillRect(1130,150,120,90);c.fillStyle="#5d3e35";c.fillRect(1120,140,140,20);c.fillStyle="#d5bb7b";c.fillRect(1175,190,28,50);
   c.fillStyle="#7b523b";c.fillRect(940,340,120,72);c.fillStyle="#4e3840";c.fillRect(930,330,140,18);
   // trees framing the wilderness
   for(let x=1260;x<1480;x+=55)for(let y=130;y<360;y+=62)this.drawTree(c,x+(y%3)*7,y,0.85);
   for(let x=100;x<680;x+=75)this.drawTree(c,x,760+(x%4)*15,0.8);
-  c.fillStyle="#ead39a";c.font="bold 18px system-ui";c.fillText("HOME FIELD",180,190);c.fillText("VILLAGE",1085,112);c.fillText("WOODLAND",1300,155);c.fillText("DEEP MINE",1540,445);
+  c.fillStyle="#ead39a";c.font="bold 18px system-ui";c.fillText("HOME FIELD",180,190);c.fillText("VILLAGE",1085,112);c.fillText("WOODLAND",1300,155);c.fillText("DEEP MINE",1540,445);c.fillText("MINE ECHO",1565,675);c.fillText("OLD GROVE",1350,510);
   // resource sprites
   for(const r of this.resources){
    if(r.type==="branch"){c.fillStyle="#76502f";c.fillRect(r.x-10,r.y-3,20,6);c.fillRect(r.x-3,r.y-12,6,18)}
@@ -63,6 +63,6 @@ regrowResources(){
   if(this.isNight()){c.fillStyle="rgba(8,12,30,.58)";c.fillRect(0,0,w,h)}
   if(this.weather==="wind"){c.strokeStyle="rgba(220,235,210,.18)";for(let i=0;i<12;i++){const y=(i*73+this.time*8)%h;c.beginPath();c.moveTo(0,y);c.lineTo(w,y+8);c.stroke()}}
  }
- serialize(){return {time:this.time,day:this.day,resources:this.resources,weather:this.weather,weatherTimer:this.weatherTimer,echoLevel:this.echoLevel}}
- restore(s){if(s){this.time=s.time??this.time;this.day=s.day??1;this.resources=s.resources??this.resources;this.weather=s.weather??this.weather;this.weatherTimer=s.weatherTimer??0;this.echoLevel=s.echoLevel??0}}
+ serialize(){return {time:this.time,day:this.day,resources:this.resources,weather:this.weather,weatherTimer:this.weatherTimer,echoLevel:this.echoLevel,mineDepth:this.mineDepth}}
+ restore(s){if(s){this.time=s.time??this.time;this.day=s.day??1;this.resources=s.resources??this.resources;this.weather=s.weather??this.weather;this.weatherTimer=s.weatherTimer??0;this.echoLevel=s.echoLevel??0;this.mineDepth=s.mineDepth??0}}
 }
