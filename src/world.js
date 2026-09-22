@@ -2,7 +2,18 @@ export class World{
  constructor(){this.width=1800;this.height=1100;this.time=6*60;this.day=1;this.screenOffsetX=0;this.screenOffsetY=0;this.farm={x:120,y:170,w:520,h:390};this.resources=[];this.makeWorld()}
  makeWorld(){
   const types=["branch","fiber","rock","reed"];
-  for(let i=0;i<100;i++){const x=60+Math.random()*(this.width-120),y=60+Math.random()*(this.height-120);if(this.inFarm(x,y))continue;this.resources.push({type:types[Math.floor(Math.random()*types.length)],x,y,hp:2+Math.floor(Math.random()*2)})}
+  // Guaranteed first-minute discovery circle near home.
+  const starter=[
+   ["branch",335,315],["branch",465,320],["fiber",300,365],["fiber",500,365],
+   ["rock",350,425],["rock",455,430],["reed",280,470],["reed",525,465]
+  ];
+  for(const [type,x,y] of starter)this.resources.push({type,x,y,hp:2});
+  for(let i=0;i<92;i++){
+   const x=60+Math.random()*(this.width-120),y=60+Math.random()*(this.height-120);
+   if(this.inFarm(x,y)||Math.hypot(x-390,y-390)<170)continue;
+   this.resources.push({type:types[Math.floor(Math.random()*types.length)],x,y,hp:2+Math.floor(Math.random()*2)});
+  }
+  this.resources.push({type:"bloom",x:610,y:410,hp:3,rare:true});
  }
  inFarm(x,y){return x>this.farm.x&&x<this.farm.x+this.farm.w&&y>this.farm.y&&y<this.farm.y+this.farm.h}
  isNight(){return this.time>=20*60||this.time<6*60}
@@ -14,7 +25,13 @@ export class World{
   c.fillStyle="#6a8d9e";c.fillRect(680,110,380,150);c.fillStyle="#b0a18a";c.fillRect(1080,90,580,300);c.fillStyle="#5d4332";c.fillRect(1210,120,240,210);c.fillStyle="#2d5234";c.fillRect(1225,140,210,170);
   c.fillStyle="#77756f";c.fillRect(1500,420,220,500);c.fillStyle="#22262a";c.fillRect(1530,450,160,440);
   c.fillStyle="#d7c18d";c.font="bold 18px system-ui";c.fillText("FARM",180,190);c.fillText("VILLAGE",1160,112);c.fillText("FOREST",1280,160);c.fillText("MINE",1575,445);
-  for(const r of this.resources){if(r.type==="branch"){c.fillStyle="#76502f";c.fillRect(r.x-10,r.y-3,20,6);c.fillRect(r.x-3,r.y-12,6,18)}else if(r.type==="fiber"){c.fillStyle="#6c9d4e";c.fillRect(r.x-3,r.y-15,6,25);c.fillRect(r.x-11,r.y-7,22,5)}else if(r.type==="reed"){c.fillStyle="#9b9b58";c.fillRect(r.x-2,r.y-16,4,24);c.fillRect(r.x+3,r.y-12,8,3)}else{c.fillStyle="#70777b";c.fillRect(r.x-10,r.y-9,20,16)}}
+  for(const r of this.resources){
+   if(r.type==="branch"){c.fillStyle="#76502f";c.fillRect(r.x-10,r.y-3,20,6);c.fillRect(r.x-3,r.y-12,6,18)}
+   else if(r.type==="fiber"){c.fillStyle="#6c9d4e";c.fillRect(r.x-3,r.y-15,6,25);c.fillRect(r.x-11,r.y-7,22,5)}
+   else if(r.type==="reed"){c.fillStyle="#9b9b58";c.fillRect(r.x-2,r.y-16,4,24);c.fillRect(r.x+3,r.y-12,8,3)}
+   else if(r.type==="bloom"){c.fillStyle="#d7b7ff";c.fillRect(r.x-7,r.y-7,14,14);c.fillStyle="#fff2a8";c.fillRect(r.x-3,r.y-3,6,6)}
+   else{c.fillStyle="#70777b";c.fillRect(r.x-10,r.y-9,20,16)}
+  }
   c.restore();if(this.isNight()){c.fillStyle="rgba(8,12,30,.58)";c.fillRect(0,0,w,h)}
  }
  serialize(){return {time:this.time,day:this.day,resources:this.resources}}
