@@ -26,7 +26,7 @@ export class Game{
  start(){requestAnimationFrame(t=>this.loop(t))}
  loop(t){const dt=Math.min((t-this.last)/1000,.05);this.last=t;this.fps=1/Math.max(dt,.001);if(!this.paused){this.systems.update(dt);this.player.update(dt)}this.render();this.ui.update();requestAnimationFrame(x=>this.loop(x))}
  render(){const c=this.ctx,w=this.canvas.width,h=this.canvas.height;c.clearRect(0,0,w,h);this.world.render(c,w,h,this.player);this.systems.render(c,w,h);this.player.render(c,w,h);if(this.debug)this.ui.renderDebug(c,w,h)}
- save(){localStorage.setItem("starRepublicSaveV2",JSON.stringify({player:this.player.serialize(),world:this.world.serialize()}));this.ui.toast("Oyun kaydedildi")}
- load(){try{const raw=localStorage.getItem("starRepublicSaveV2");if(!raw)return;const s=JSON.parse(raw);this.player.restore(s.player);this.world.restore(s.world)}catch(e){console.warn("save load",e)}}
+ save(){localStorage.setItem("starRepublicSaveV2",JSON.stringify({player:this.player.serialize(),world:this.world.serialize(),farm:this.systems.farmSlots}));this.ui.toast("Oyun kaydedildi")}
+ load(){try{const raw=localStorage.getItem("starRepublicSaveV2");if(!raw)return;const s=JSON.parse(raw);this.player.restore(s.player);this.world.restore(s.world);if(Array.isArray(s.farm)&&s.farm.length===this.systems.farmSlots.length)this.systems.farmSlots=s.farm}catch(e){console.warn("save load",e)}}
  reset(){localStorage.removeItem("starRepublicSaveV2");location.reload()}
 }
