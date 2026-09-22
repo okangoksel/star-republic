@@ -16,5 +16,5 @@ export class Player{
   c.fillStyle="#1d2634";c.fillRect(-6,-7,3,3);c.fillRect(3,-7,3,3);
   c.restore()}
  serialize(){return {x:this.x,y:this.y,maxHp:this.maxHp,hp:this.hp,maxEnergy:this.maxEnergy,energy:this.energy,level:this.level,xp:this.xp,gold:this.gold,attack:this.attack,defense:this.defense,hotbar:this.hotbar,inventory:this.inventory,equipment:this.equipment,discoveries:this.discoveries,resonance:this.resonance}}
- restore(s){if(!s)return;Object.assign(this,s);this.inventory=s.inventory||{};this.equipment=s.equipment||{weapon:null,tool:null,armor:null};this.discoveries=s.discoveries||{hands:true};this.resonance=s.resonance??0;this.inventoryApi=new Inventory(this)}
+ restore(s){if(!s)return;Object.assign(this,s);this.inventory=s.inventory||{};if(!this.inventory.field_book)this.inventory.field_book=1;this.equipment=s.equipment||{weapon:null,tool:null,armor:null};this.discoveries=s.discoveries||{hands:true};this.resonance=s.resonance??0;this.inventoryApi=new Inventory(this)}
 }
