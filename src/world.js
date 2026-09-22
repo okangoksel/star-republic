@@ -1,5 +1,5 @@
 export class World{
- constructor(){this.width=1800;this.height=1100;this.time=6*60;this.day=1;this.screenOffsetX=0;this.screenOffsetY=0;this.farm={x:120,y:170,w:520,h:390};this.resources=[];this.makeWorld()}
+ constructor(){this.width=1800;this.height=1100;this.time=6*60;this.day=1;this.screenOffsetX=0;this.screenOffsetY=0;this.farm={x:120,y:170,w:520,h:390};this.resources=[];this.weather="clear";this.weatherTimer=0;this.echoLevel=0;this.makeWorld()}
  makeWorld(){
   const types=["branch","fiber","rock","reed"];
   const starter=[["branch",335,315],["branch",465,320],["fiber",300,365],["fiber",500,365],["rock",350,425],["rock",455,430],["reed",280,470],["reed",525,465]];
@@ -9,7 +9,17 @@ export class World{
  }
  inFarm(x,y){return x>this.farm.x&&x<this.farm.x+this.farm.w&&y>this.farm.y&&y<this.farm.y+this.farm.h}
  isNight(){return this.time>=20*60||this.time<6*60}
- update(dt){this.time+=dt*3;if(this.time>=24*60){this.time-=24*60;this.day++}}
+ update(dt){
+  this.time+=dt*3;this.weatherTimer+=dt;
+  if(this.weatherTimer>18){this.weatherTimer=0;this.rollWeather()}
+  if(this.time>=24*60){this.time-=24*60;this.day++;this.regrowResources();this.rollWeather()}
+}
+rollWeather(){const pool=["clear","rain","wind","veil"];this.weather=pool[(this.day*7+Math.floor(this.time/60))%pool.length]}
+regrowResources(){
+  const count=Math.min(18,4+Math.floor(this.day/2));
+  const types=["branch","fiber","rock","reed"];
+  for(let i=0;i<count;i++){const x=80+Math.random()*(this.width-160),y=100+Math.random()*(this.height-200);if(this.inFarm(x,y)||Math.hypot(x-390,y-390)<140||this.resources.some(r=>Math.hypot(r.x-x,r.y-y)<42))continue;this.resources.push({type:types[(i+this.day)%types.length],x,y,hp:2+Math.floor(Math.random()*2)})}
+}
  drawTree(c,x,y,s=1){c.fillStyle="#5a3b29";c.fillRect(x-4*s,y+8*s,8*s,20*s);c.fillStyle="#28533a";c.fillRect(x-22*s,y-15*s,44*s,28*s);c.fillStyle="#356b45";c.fillRect(x-15*s,y-27*s,30*s,22*s);c.fillStyle="#438052";c.fillRect(x-8*s,y-33*s,16*s,14*s)}
  render(c,w,h,p){
   this.screenOffsetX=w/2-p.x;this.screenOffsetY=h/2-p.y;c.save();c.translate(this.screenOffsetX,this.screenOffsetY);
@@ -47,8 +57,12 @@ export class World{
    else if(r.type==="bloom"){c.fillStyle="rgba(210,170,255,.25)";c.fillRect(r.x-18,r.y-18,36,36);c.fillStyle="#d7b7ff";c.fillRect(r.x-7,r.y-7,14,14);c.fillStyle="#fff2a8";c.fillRect(r.x-3,r.y-3,6,6)}
    else{c.fillStyle="#70777b";c.fillRect(r.x-10,r.y-9,20,16);c.fillStyle="#8d9599";c.fillRect(r.x-5,r.y-12,10,4)}
   }
-  c.restore();if(this.isNight()){c.fillStyle="rgba(8,12,30,.58)";c.fillRect(0,0,w,h)}
+  c.restore();
+  if(this.weather==="rain"){c.fillStyle="rgba(70,100,130,.10)";c.fillRect(0,0,w,h);c.strokeStyle="rgba(170,210,235,.35)";for(let i=0;i<90;i++){const x=(i*83+this.time*2)%w,y=(i*47+this.time*4)%h;c.beginPath();c.moveTo(x,y);c.lineTo(x-5,y+14);c.stroke()}}
+  if(this.weather==="veil"){c.fillStyle="rgba(130,100,180,.10)";c.fillRect(0,0,w,h)}
+  if(this.isNight()){c.fillStyle="rgba(8,12,30,.58)";c.fillRect(0,0,w,h)}
+  if(this.weather==="wind"){c.strokeStyle="rgba(220,235,210,.18)";for(let i=0;i<12;i++){const y=(i*73+this.time*8)%h;c.beginPath();c.moveTo(0,y);c.lineTo(w,y+8);c.stroke()}}
  }
- serialize(){return {time:this.time,day:this.day,resources:this.resources}}
- restore(s){if(s){this.time=s.time??this.time;this.day=s.day??1;this.resources=s.resources??this.resources}}
+ serialize(){return {time:this.time,day:this.day,resources:this.resources,weather:this.weather,weatherTimer:this.weatherTimer,echoLevel:this.echoLevel}}
+ restore(s){if(s){this.time=s.time??this.time;this.day=s.day??1;this.resources=s.resources??this.resources;this.weather=s.weather??this.weather;this.weatherTimer=s.weatherTimer??0;this.echoLevel=s.echoLevel??0}}
 }
