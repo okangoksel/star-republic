@@ -23,3 +23,12 @@ The player does not receive a complete starter kit.
 ## Design rule
 Do not copy names, art, maps, UI layouts, progression beats, lore, characters or distinctive mechanics from existing games.
 Use familiar genre foundations only where they are generic and necessary for playability.
+
+
+## Latest original systems
+- **Weather Pulse:** clear, rain, wind and Resonance Veil alter the feel and some resource/economy behavior.
+- **Resonance:** gathering gradually raises a hidden-world signal; thresholds unlock discoveries rather than raw stat inflation.
+- **Discovery Journal:** the player records systems through observation instead of receiving a full tutorial checklist.
+- **Echo Exploration:** the Deep Mine and Old Grove are repeatable non-combat exploration points with persistent discoveries.
+- **Daily Renewal:** parts of the wilderness regenerate as days pass, keeping exploration useful without infinite static spawning.
+- **Responsive Market:** selected prices react to current world conditions.
