@@ -47,6 +47,27 @@ export class Systems{
   w.time=6*60;w.day++;w.regrowResources();w.rollWeather();this.enemies.length=0;w.dawnWavePending=false;
   p.energy=p.maxEnergy;p.hp=p.maxHp;p.x=390;p.y=360;this.game.ui.toast("İyi dinlendin. Gün "+w.day+" başladı.");this.game.save(true);
  }
+ tryHiddenDiscovery(){
+  const p=this.game.player,w=this.game.world;
+  const checks=[
+    {key:"groveShrine",x:1360,y:475,name:"Korunun Gizli Sunağı",reward:"ancient_relic",amount:1,xp:30,msg:"Gizli keşif: Eski Korunun sunağını buldun."},
+    {key:"meteorCrater",x:1010,y:375,name:"Göktaşı Krateri",reward:"star_fragment",amount:1,xp:40,msg:"Gizli keşif: Göktaşı Krateri bulundu."},
+    {key:"oldCabin",x:1190,y:205,name:"Eski Kulübe",reward:"wood",amount:3,xp:20,msg:"Gizli keşif: Eski Kulübenin izlerini buldun."}
+  ];
+  for(const d of checks){
+    if(w.hiddenDiscoveries?.[d.key])continue;
+    if(Math.hypot(p.x-d.x,p.y-d.y)<70){
+      if(!w.hiddenDiscoveries)w.hiddenDiscoveries={groveShrine:false,meteorCrater:false,oldCabin:false};
+      w.hiddenDiscoveries[d.key]=true;
+      p.addItem(d.reward,d.amount);
+      p.gainXp(d.xp);
+      this.game.ui.toast(d.msg+" +"+d.amount+" "+item(d.reward).name);
+      this.game.save();
+      return true;
+    }
+  }
+  return false;
+ }
  interact(){
   if(this.sleepOrInstallBed())return;
   const p=this.game.player;const npc=nearestNPC(p);if(npc){if(npc.id==="mira")this.settlementInteract();else this.game.ui.npc(npc);return}
