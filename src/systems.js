@@ -6,8 +6,7 @@ export class Systems{
  update(dt){this.market.refresh();this.gatherCd=Math.max(0,this.gatherCd-dt);
   const beforeDay=this.game.world.day,beforeWeather=this.game.world.weather;this.game.world.update(dt);
   if(this.game.world.day!==beforeDay){this.lastDay=this.game.world.day;this.game.player.energy=this.game.player.maxEnergy;this.game.ui.toast("Yeni gün başladı. Enerjin yenilendi.");this.game.save(true)}
-  if(beforeDay===this.game.world.day&&this.game.world.time>=360&&this.game.world.time<360+dt*3&&!this.game.world.dawnWavePending){this.game.world.dawnWavePending=true;this.spawnDawnWave();}
-  if(this.game.world.time>=360+dt*3)this.game.world.dawnWavePending=false;
+  if(!this.game.world.isNight()&&this.enemies.length)this.enemies.length=0;
   if(this.game.world.weather!==beforeWeather){this.lastWeather=this.game.world.weather;this.game.ui.toast("Hava değişti: "+this.game.ui.weatherName(this.game.world.weather));}this.lastSpawn+=dt;
   if(!this.game.world.isNight())this.game.player.energy=Math.min(this.game.player.maxEnergy,this.game.player.energy+dt*1.2);
   for(const crop of this.farmSlots){
@@ -30,7 +29,26 @@ export class Systems{
   let best=null,bd=48;for(const e of this.enemies){const d=Math.hypot(e.x-x,e.y-y);if(d<bd){best=e;bd=d}}
   if(best){best.hp-=dmg;this.particles.push({x:best.x,y:best.y,text:"-"+dmg,life:.6});if(best.hp<=0){this.game.player.addItem("stone",1+Math.floor(Math.random()*2));this.game.player.gainXp(25);this.particles.push({x:best.x,y:best.y,text:"+Taş",life:1});this.enemies.splice(this.enemies.indexOf(best),1);this.game.ui.toast("Tehdit dağıldı. Bir şeyler topladın.")}}
  }
+ sleepOrInstallBed(){
+  const p=this.game.player,w=this.game.world;
+  const nearBed=Math.hypot(p.x-390,p.y-168)<75;
+  if(!nearBed)return false;
+  if(!w.bedInstalled){
+   if((p.inventory.bed||0)<1){this.game.ui.toast("Önce C ile Yatak üretmelisin.");return true}
+   if(w.isNight()){p.removeItem("bed",1);w.bedInstalled=true;this.game.ui.toast("Yatak kuruldu. E ile uyuyabilirsin.");this.game.save();this.sleepAtBed();return true}
+   p.removeItem("bed",1);w.bedInstalled=true;this.game.ui.toast("Yatak eve yerleştirildi.");this.game.save();return true;
+  }
+  if(w.isNight()){this.sleepAtBed();return true}
+  this.game.ui.toast("Yatak gece kullanılabilir.");
+  return true;
+ }
+ sleepAtBed(){
+  const w=this.game.world,p=this.game.player;
+  w.time=6*60;w.day++;w.regrowResources();w.rollWeather();this.enemies.length=0;w.dawnWavePending=false;
+  p.energy=p.maxEnergy;p.hp=p.maxHp;p.x=390;p.y=360;this.game.ui.toast("İyi dinlendin. Gün "+w.day+" başladı.");this.game.save(true);
+ }
  interact(){
+  if(this.sleepOrInstallBed())return;
   const p=this.game.player;const npc=nearestNPC(p);if(npc){if(npc.id==="mira")this.settlementInteract();else this.game.ui.npc(npc);return}
   if(this.tryHiddenDiscovery())return;
   let near=null,dist=999;
@@ -92,11 +110,13 @@ gather(r){
   for(const s of this.farmSlots){c.fillStyle="#765337";c.fillRect(s.x-18,s.y-18,36,36);if(s.state==="growing"){c.fillStyle="#5fae52";const h=8+Math.min(18,s.growth);c.fillRect(s.x-3,s.y+7-h,6,h)}if(s.state==="ready"){c.fillStyle="#d8b94e";c.fillRect(s.x-7,s.y-13,14,22)}}
   for(const e of this.enemies){c.fillStyle="#4a8a52";c.fillRect(e.x-12,e.y-12,24,24);c.fillStyle="#111";c.fillRect(e.x-7,e.y-4,4,4);c.fillRect(e.x+3,e.y-4,4,4);c.fillStyle="#8b2d2d";c.fillRect(e.x-12,e.y-19,24,4)}
   for(const q of this.particles){c.fillStyle="#fff";c.font="bold 14px system-ui";c.fillText(q.text,q.x,q.y-(1-q.life)*35)}
+  if(this.game.world.bedInstalled){c.fillStyle="#6b4b33";c.fillRect(372,150,36,12);c.fillStyle="#d9c6a5";c.fillRect(378,143,24,12);c.fillStyle="#8aa4c4";c.fillRect(378,143,24,5);}
   const p=this.game.player;let hint="";let hd=60;
   for(const r of this.game.world.resources){const d=Math.hypot(p.x-r.x,p.y-r.y);if(d<hd){hd=d;hint=r.type==="bloom"?"✦ Astral Bloom · E keşfet":"E · Kaynak topla"}}
   const npc=nearestNPC(p);if(npc){hint="E · "+npc.name+" ile konuş";hd=0}
   if(Math.hypot(p.x-1610,p.y-650)<75)hint="E · Madeni keşfet";
   if(Math.hypot(p.x-1400,p.y-500)<75)hint="E · Eski Koruyu incele";
+  if(Math.hypot(p.x-390,p.y-168)<75)hint=this.game.world.bedInstalled?(this.game.world.isNight()?"E · Uyu ve sabaha geç":"Yatak · Gece kullanılabilir"):"E · Yatağı yerleştir";
   if(hint){c.setTransform(1,0,0,1,0,0);c.fillStyle="rgba(10,14,20,.82)";c.fillRect(c.canvas.width/2-150,c.canvas.height-92,300,34);c.fillStyle="#fff";c.font="bold 14px system-ui";c.textAlign="center";c.fillText(hint,c.canvas.width/2,c.canvas.height-70);c.textAlign="left"}
   c.restore();
  }
