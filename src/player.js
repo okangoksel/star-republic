@@ -1,10 +1,11 @@
 import {Inventory} from "./inventory.js";
 import {item} from "./items.js";
+
 export class Player{
  constructor(game){
   this.game=game;this.x=390;this.y=360;this.r=14;this.speed=150;
   this.maxHp=100;this.hp=100;this.maxEnergy=100;this.energy=100;
-  this.level=1;this.xp=0;this.gold=0;this.attack=3;this.defense=0;
+  this.level=1;this.xp=0;this.gold=0;this.attackPower=3;this.defense=0;
   this.hotbar=0;this.attackCd=0;this.attackAnim=0;this.attackAngle=0;
   this.inventory={field_book:1};this.equipment={weapon:null,tool:null,armor:null};
   this.discoveries={hands:true};this.resonance=0;this.walkTime=0;this.facing=1;this.inventoryApi=new Inventory(this);
@@ -31,13 +32,13 @@ export class Player{
   this.attackAngle=Math.atan2(wy-this.y,wx-this.x);
   const weapon=this.equipment.weapon?item(this.equipment.weapon):null;
   if(!weapon){this.attackCd=.75;this.game.systems.handStrike();return}
-  this.attackCd=.48;this.game.systems.hit(wx,wy,weapon.damage??this.attack);
+  this.attackCd=.48;this.game.systems.hit(wx,wy,weapon.damage??this.attackPower);
  }
  gainXp(n){
   this.xp+=n;
   while(this.xp>=this.level*100){
    this.xp-=this.level*100;this.level++;this.maxHp+=8;this.maxEnergy+=5;
-   this.hp=this.maxHp;this.energy=this.maxEnergy;this.attack+=2;
+   this.hp=this.maxHp;this.energy=this.maxEnergy;this.attackPower+=2;
    this.game.ui.toast("Yeni seviye! Lv."+this.level);
   }
  }
@@ -61,10 +62,16 @@ export class Player{
   }
   c.restore();
  }
- serialize(){return {x:this.x,y:this.y,maxHp:this.maxHp,hp:this.hp,maxEnergy:this.maxEnergy,energy:this.energy,level:this.level,xp:this.xp,gold:this.gold,attack:this.attack,defense:this.defense,hotbar:this.hotbar,inventory:this.inventory,equipment:this.equipment,discoveries:this.discoveries,resonance:this.resonance}}
+ serialize(){
+  return {x:this.x,y:this.y,maxHp:this.maxHp,hp:this.hp,maxEnergy:this.maxEnergy,energy:this.energy,level:this.level,xp:this.xp,gold:this.gold,attackPower:this.attackPower,defense:this.defense,hotbar:this.hotbar,inventory:this.inventory,equipment:this.equipment,discoveries:this.discoveries,resonance:this.resonance};
+ }
  restore(s){
   if(!s)return;
-  Object.assign(this,s);this.inventory=s.inventory||{};
+  this.x=s.x??this.x;this.y=s.y??this.y;this.maxHp=s.maxHp??this.maxHp;this.hp=s.hp??this.hp;
+  this.maxEnergy=s.maxEnergy??this.maxEnergy;this.energy=s.energy??this.energy;
+  this.level=s.level??this.level;this.xp=s.xp??this.xp;this.gold=s.gold??this.gold;
+  this.attackPower=s.attackPower??s.attack??this.attackPower;this.defense=s.defense??this.defense;
+  this.hotbar=s.hotbar??this.hotbar;this.inventory=s.inventory||{};
   if(!this.inventory.field_book)this.inventory.field_book=1;
   this.equipment=s.equipment||{weapon:null,tool:null,armor:null};
   this.discoveries=s.discoveries||{hands:true};this.resonance=s.resonance??0;
