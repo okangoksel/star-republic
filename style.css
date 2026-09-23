@@ -98,3 +98,5 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;background
 @media(max-width:700px){.craft-layout{grid-template-columns:1fr!important}.craft-hero-icon{font-size:42px}.craft-detail{padding:10px}.craft-tabs{overflow-x:auto;flex-wrap:nowrap}.craft-tab{white-space:nowrap}}
 
 .tutorial{position:absolute;left:18px;bottom:78px;max-width:330px;padding:12px 14px;z-index:5;background:rgba(12,18,24,.9);border:1px solid rgba(255,255,255,.14);border-radius:10px;pointer-events:none}.tutorial-title{font-weight:800;margin-bottom:5px;color:#f6d36b}.tutorial #tutorial-text{font-size:13px;line-height:1.4;color:#eef2e8}.tutorial.done{opacity:.55}.tutorial.hidden{display:none}@media(max-width:700px){.tutorial{left:10px;bottom:150px;max-width:250px;font-size:12px}}
+
+.attack-button{position:relative;overflow:hidden}.attack-button .attack-stick{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:rgba(217,90,90,.9);border:2px solid rgba(255,255,255,.8);transition:transform .04s linear;will-change:transform;pointer-events:none}.attack-button{touch-action:none}.attack-button:active{filter:brightness(1.15)}
