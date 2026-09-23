@@ -7,6 +7,8 @@ export class World{
   for(let i=0;i<92;i++){const x=60+Math.random()*(this.width-120),y=60+Math.random()*(this.height-120);if(this.inFarm(x,y)||Math.hypot(x-390,y-390)<170)continue;this.resources.push({type:types[Math.floor(Math.random()*types.length)],x,y,hp:2+Math.floor(Math.random()*2)})}
   this.resources.push({type:"bloom",x:610,y:410,hp:3,rare:true});
   this.resources.push({type:"crystal",x:1580,y:560,hp:2,rare:true},{type:"crystal",x:1660,y:735,hp:2,rare:true},{type:"star_fragment",x:1490,y:820,hp:1,rare:true});
+  // special resources hidden behind progression gates
+  for(const [type,x,y] of [["moonstone",1300,430],["moonstone",1360,470],["ancient_relic",1510,500],["ancient_relic",1580,520],["glow_mushroom",1260,790],["glow_mushroom",1320,830],["star_fragment",1400,820]])this.resources.push({type,x,y,hp:2,rare:true});
  }
  inFarm(x,y){return x>this.farm.x&&x<this.farm.x+this.farm.w&&y>this.farm.y&&y<this.farm.y+this.farm.h}
  isNight(){return this.time>=20*60||this.time<6*60}
