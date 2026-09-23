@@ -41,12 +41,54 @@ renderHotbar(){
  icon(id){return item(id).icon||""}
  toggleInventory(){const el=this.$("inventory");if(!el.classList.contains("hidden")){el.classList.add("hidden");return}el.classList.remove("hidden");this.renderInventory()}
  renderInventory(){
-  const el=this.$("inventory"),p=this.game.player,entries=p.inventoryApi.entries().sort((a,b)=>a.data.type.localeCompare(b.data.type,"tr")||a.data.name.localeCompare(b.data.name,"tr"));
-  el.innerHTML='<div class="modal-card inventory-card"><div class="inv-title"><h2>Çanta</h2><span class="close">I / Kapat</span></div><p class="muted">Bir eşyaya tıklayarak uygun bir işlem yapabilirsin.</p><div class="inventory-tools"><button id="sort-inventory">↕ Düzeni Yenile</button></div><div class="inventory-grid">'+Array.from({length:24},(_,i)=>{const e=entries[i];return '<button class="inv-slot" data-item="'+(e?e.id:"")+'" '+(e?"":"disabled")+'>'+(e?'<b>'+e.data.icon+' '+e.data.name+'</b><span class="qty">x'+e.qty+'</span>':'')+'</button>'}).join("")+'</div><p>💰 '+p.gold+' · Alet: '+(p.equipment.tool?item(p.equipment.tool).name:"Yok")+' · Seçili yuva: '+(p.hotbar+1)+'</p></div>';
-  const sortBtn=el.querySelector("#sort-inventory");if(sortBtn)sortBtn.onclick=()=>this.renderInventory();
-  el.querySelectorAll("[data-item]").forEach(b=>b.onclick=()=>this.useInventoryItem(b.dataset.item));
+  const el=this.$("inventory"),p=this.game.player,inv=p.inventoryApi,slots=inv.slotEntries(24);
+  el.innerHTML='<div class="modal-card inventory-card"><div class="inv-title"><h2>Çanta</h2><span class="close">I / Kapat</span></div><p class="muted">Eşyayı basılı tutup sürükleyerek başka bir slota bırakabilirsin. Mobilde uzun basma veya bir slota dokunup başka slota dokunma da çalışır.</p><div class="inventory-tools"><button id="sort-inventory">↕ Düzeni Yenile</button></div><div class="inventory-grid">'+slots.map((e,i)=>'<button class="inv-slot" data-slot="'+i+'" data-item="'+(e?e.id:"")+'" '+(e?'draggable="true"':'disabled')+'>'+(e?'<b>'+e.data.icon+' '+e.data.name+'</b><span class="qty">x'+e.qty+'</span>':'')+'</button>').join("")+'</div><p>💰 '+p.gold+' · Alet: '+(p.equipment.tool?item(p.equipment.tool).name:"Yok")+' · Seçili yuva: '+(p.hotbar+1)+'</p></div>';
+  const sortBtn=el.querySelector("#sort-inventory");
+  if(sortBtn)sortBtn.onclick=()=>{p.inventoryOrder=Object.keys(p.inventory);this.renderInventory()};
+  let dragSlot=null,longPressTimer=null,longPressSlot=null,moved=false;
+  const clearLong=()=>{if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null}longPressSlot=null};
+  el.querySelectorAll(".inv-slot").forEach(b=>{
+    const slot=Number(b.dataset.slot);
+    b.addEventListener("dragstart",e=>{dragSlot=slot;e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",String(slot))});
+    b.addEventListener("dragover",e=>{if(b.dataset.item){e.preventDefault();b.classList.add("drag-over")}});
+    b.addEventListener("dragleave",()=>b.classList.remove("drag-over"));
+    b.addEventListener("drop",e=>{
+      e.preventDefault();b.classList.remove("drag-over");
+      const from=dragSlot??Number(e.dataTransfer.getData("text/plain"));
+      if(Number.isInteger(from)&&inv.moveSlots(from,slot)){this.toast("Eşyanın yeri değiştirildi.");this.renderInventory()}
+      dragSlot=null;
+    });
+    b.addEventListener("dragend",()=>{dragSlot=null;b.classList.remove("drag-over")});
+    b.addEventListener("pointerdown",e=>{
+      if(!b.dataset.item)return;
+      moved=false;
+      const sx=e.clientX,sy=e.clientY;
+      longPressSlot=slot;
+      longPressTimer=setTimeout(()=>{dragSlot=slot;this.toast("Taşıma modu: hedef slota dokun.");longPressTimer=null},450);
+      const move=ev=>{if(Math.hypot(ev.clientX-sx,ev.clientY-sy)>10){moved=true;clearLong();b.removeEventListener("pointermove",move)}};
+      b.addEventListener("pointermove",move);
+    });
+    b.addEventListener("pointerup",e=>{
+      clearLong();
+      if(dragSlot!==null&&dragSlot!==slot){
+        if(inv.moveSlots(dragSlot,slot)){this.toast("Eşyanın yeri değiştirildi.");this.renderInventory()}
+        dragSlot=null;return;
+      }
+      if(dragSlot===slot){dragSlot=null;return}
+      if(moved)return;
+      this.useInventoryItem(b.dataset.item);
+    });
+    b.addEventListener("pointercancel",clearLong);
+    b.addEventListener("click",e=>{
+      if(e.detail>1)return;
+      if(dragSlot!==null&&dragSlot!==slot){
+        if(inv.moveSlots(dragSlot,slot)){this.toast("Eşyanın yeri değiştirildi.");this.renderInventory()}
+        dragSlot=null;
+      }
+    });
+  });
   el.onclick=e=>{if(e.target.classList.contains("close")||e.target===el)el.classList.add("hidden")}
- }
+}
  useInventoryItem(id){
   if(!id)return;
   const p=this.game.player,info=item(id);
