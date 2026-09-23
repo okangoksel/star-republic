@@ -1,4 +1,4 @@
-import {Player} from "./player.js";
+import {Player} from "./player.js?v=0.3.1";
 import {World} from "./world.js";
 import {Systems} from "./systems.js";
 import {UI} from "./ui.js";
