@@ -6,6 +6,7 @@ export class World{
   for(const [type,x,y] of starter)this.resources.push({type,x,y,hp:2});
   for(let i=0;i<92;i++){const x=60+Math.random()*(this.width-120),y=60+Math.random()*(this.height-120);if(this.inFarm(x,y)||Math.hypot(x-390,y-390)<170)continue;this.resources.push({type:types[Math.floor(Math.random()*types.length)],x,y,hp:2+Math.floor(Math.random()*2)})}
   this.resources.push({type:"bloom",x:610,y:410,hp:3,rare:true});
+  this.resources.push({type:"crystal",x:1580,y:560,hp:2,rare:true},{type:"crystal",x:1660,y:735,hp:2,rare:true},{type:"star_fragment",x:1490,y:820,hp:1,rare:true});
  }
  inFarm(x,y){return x>this.farm.x&&x<this.farm.x+this.farm.w&&y>this.farm.y&&y<this.farm.y+this.farm.h}
  isNight(){return this.time>=20*60||this.time<6*60}
@@ -55,6 +56,8 @@ regrowResources(){
    else if(r.type==="fiber"){c.fillStyle="#6c9d4e";c.fillRect(r.x-3,r.y-15,6,25);c.fillRect(r.x-11,r.y-7,22,5)}
    else if(r.type==="reed"){c.fillStyle="#9b9b58";c.fillRect(r.x-2,r.y-16,4,24);c.fillRect(r.x+3,r.y-12,8,3)}
    else if(r.type==="bloom"){c.fillStyle="rgba(210,170,255,.25)";c.fillRect(r.x-18,r.y-18,36,36);c.fillStyle="#d7b7ff";c.fillRect(r.x-7,r.y-7,14,14);c.fillStyle="#fff2a8";c.fillRect(r.x-3,r.y-3,6,6)}
+   else if(r.type==="crystal"){c.fillStyle="#5c9fb3";c.fillRect(r.x-6,r.y-14,12,24);c.fillStyle="#b7f0ff";c.fillRect(r.x-3,r.y-17,6,10);c.fillStyle="rgba(170,235,255,.25)";c.fillRect(r.x-13,r.y-18,26,30)}
+   else if(r.type==="star_fragment"){c.fillStyle="#e8d38c";c.fillRect(r.x-5,r.y-12,10,24);c.fillStyle="#fff6bf";c.fillRect(r.x-2,r.y-16,4,8);c.fillStyle="rgba(255,230,130,.22)";c.fillRect(r.x-16,r.y-16,32,32)}
    else{c.fillStyle="#70777b";c.fillRect(r.x-10,r.y-9,20,16);c.fillStyle="#8d9599";c.fillRect(r.x-5,r.y-12,10,4)}
   }
   c.restore();
