@@ -1,7 +1,7 @@
 import {item} from "./items.js";
 import {RECIPES,canCraft,craft} from "./crafting.js";import {QUESTS} from "./quests.js";
 export class UI{
- constructor(game){this.game=game;this.$=id=>document.getElementById(id);this.bind()}
+ constructor(game){this.game=game;this.$=id=>document.getElementById(id);this.selectedInventoryItem=null;this.bind()}
  bind(){
   this.$("resume").onclick=()=>{this.game.paused=false;this.setMenu(false)};
   this.$("save").onclick=()=>this.game.save();this.$("reset").onclick=()=>this.game.reset();
@@ -92,14 +92,15 @@ renderHotbar(){
  useInventoryItem(id){
   if(!id)return;
   const p=this.game.player,info=item(id);
-  if(info.type==="tool"){p.equipment.tool=id;this.toast(info.name+" kuşanıldı.");this.renderInventory();return}
+  if(info.type==="tool"){p.equipment.tool=id;this.selectedInventoryItem=null;this.toast(info.name+" kuşanıldı.");this.renderInventory();return}
+  this.selectedInventoryItem=id;
   if(info.type==="food"){
    const before=p.energy;
    p.energy=Math.min(p.maxEnergy,p.energy+25);
    if(p.energy>before){p.removeItem(id,1);this.toast(info.name+" kullandın. +"+Math.round(p.energy-before)+" enerji.");this.renderInventory()}
    return;
   }
-  p.addItem(id,0);this.toast(info.name+" seçildi.");
+  p.addItem(id,0);this.toast(info.name+" seçildi. Şimdi dünyada E ile kullanabilirsin.");
  }
  toggleQuests(){const el=this.$("inventory");el.classList.remove("hidden");const qs=this.game.quests;el.innerHTML=`<div class="modal-card inventory-card"><div class="inv-title"><h2>Görevler</h2><span class="close">J / Kapat</span></div>${QUESTS.map(q=>{const done=!!qs.done[q.id],ready=qs.progress(q);return `<button class="recipe" data-quest="${q.id}" ${done||!ready?"disabled":""}><b>${done?"✓ ":""}${q.name}</b><span>${q.text}</span><small>${done?"Tamamlandı":"Ödül: "+q.reward+" altın · "+(ready?"Hazır":"Henüz hazır değil")}</small></button>`}).join("")}</div>`;el.querySelectorAll("[data-quest]").forEach(b=>b.onclick=()=>{const q=QUESTS.find(x=>x.id===b.dataset.quest);qs.claim(q);this.toggleQuests()});el.onclick=e=>{if(e.target.classList.contains("close")||e.target===el)el.classList.add("hidden")}}
  toggleMap(){const el=this.$("inventory");el.classList.remove("hidden");el.innerHTML=`<div class="modal-card inventory-card"><div class="inv-title"><h2>Dünya Haritası</h2><span class="close">M / Kapat</span></div><div class="map-card"><div>🏡 <b>Ev / Tarla</b> · başlangıç bölgesi</div><div>🏘️ <b>Köy</b> · NPC ve pazar</div><div>🌲 <b>Woodland</b> · lif ve yabani kaynaklar</div><div>⛏️ <b>Deep Mine</b> · ileride derinleşecek keşif alanı</div><div>✦ <b>Astral Bloom</b> · ilk büyük gizem</div></div></div>`;el.onclick=e=>{if(e.target.classList.contains("close")||e.target===el)el.classList.add("hidden")}}
