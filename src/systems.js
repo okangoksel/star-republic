@@ -65,10 +65,10 @@ gather(r){
   if(r.type==="branch"){id="branch";gain=1+(Math.random()<.35?1:0)+(tool==="hand_axe"?1:0)}
   if(r.type==="fiber"){id="fiber";gain=1}
   if(r.type==="reed"){id="reed";gain=1}
-  if(r.type==="bloom"){id="astral_dust";gain=1}
+  if(r.type==="bloom"){id="astral_dust";gain=tool==="astral_compass"?2:1}
   if(r.type==="rock"){id=Math.random()<.18?"flint":"stone";gain=tool==="crude_tool"?2:1}
-  if(r.type==="crystal"){id=Math.random()<.22?"echo_shard":"crystal";gain=1+(this.game.world.echoLevel>=2?1:0)}
-  if(r.type==="star_fragment"){id="star_fragment";gain=1}
+  if(r.type==="crystal"){id=Math.random()<.22?"echo_shard":"crystal";gain=1+(this.game.world.echoLevel>=2?1:0)+(tool==="resonance_lens"?1:0)}
+  if(r.type==="star_fragment"){id="star_fragment";gain=tool==="resonance_lens"?2:1}
   p.addItem(id,gain);
   const resonanceGain=r.type==="bloom"?12:(r.type==="crystal"?5:(r.type==="star_fragment"?15:(r.type==="rock"?2:1)));
   p.resonance=Math.min(100,p.resonance+resonanceGain);
