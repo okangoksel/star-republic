@@ -38,14 +38,14 @@ export class Systems{
   if(Math.hypot(p.x-1400,p.y-500)<75){this.exploreGrove();return}
   if(this.game.world.inFarm(p.x,p.y)){const slot=this.farmSlots.find(s=>Math.hypot(s.x-p.x,s.y-p.y)<30);if(!slot)return;
    if(slot.state==="ready"){
-     const out={wheat:"wheat",carrot:"carrot",potato:"potato",tomato:"tomato",corn:"corn"}[slot.crop]||"wheat";
+     const out={wheat:"wheat",carrot:"carrot",potato:"potato",tomato:"tomato",corn:"corn",starfruit:"starfruit",moonberry:"moonberry"}[slot.crop]||"wheat";
      p.addItem(out,2);p.gainXp(18);slot.state="empty";slot.growth=0;slot.watered=false;slot.seed=null;slot.crop=null;this.game.ui.toast(item(out).name+" hasat edildi.");
    }else if(slot.state==="growing"&&!slot.watered&&p.energy>=2){slot.watered=true;p.energy-=2;this.game.ui.toast("Toprak canlandı.")}
    else if(slot.state==="empty"){
      if(p.energy<2){this.game.ui.toast("Ekim için en az 2 enerji gerekiyor.");return}
      const seeds=["wheat_seed","carrot_seed","potato_seed","tomato_seed","corn_seed","starfruit_seed","moonberry_seed","reed_seed"].filter(id=>(p.inventory[id]||0)>0);
      if(!seeds.length){this.game.ui.toast("Önce bir tohum bul veya üret. Çantayı I ile aç.");return}
-     const seed=seeds[0];if(p.removeItem(seed,1)){slot.state="growing";slot.growth=0;slot.watered=true;slot.seed=seed;slot.crop={wheat_seed:"wheat",reed_seed:"wheat",carrot_seed:"carrot",potato_seed:"potato",tomato_seed:"tomato",corn_seed:"corn",starfruit_seed:"starfruit",moonberry_seed:"moonberry"}[seed];p.energy-=2;p.gainXp(5);this.game.ui.toast(item(seed).name+" ekildi.");}
+     const hotId=p.inventoryOrder?.[p.hotbar];const seed=hotId&&seeds.includes(hotId)?hotId:seeds[0];if(p.removeItem(seed,1)){slot.state="growing";slot.growth=0;slot.watered=true;slot.seed=seed;slot.crop={wheat_seed:"wheat",reed_seed:"wheat",carrot_seed:"carrot",potato_seed:"potato",tomato_seed:"tomato",corn_seed:"corn",starfruit_seed:"starfruit",moonberry_seed:"moonberry"}[seed];p.energy-=2;p.gainXp(5);this.game.ui.toast(item(seed).name+" ekildi.");}
    }else this.game.ui.toast("Bu tarla karesi hazır değil.")
   }
  }
@@ -63,13 +63,13 @@ exploreGrove(){
 }
 gather(r){
   if(this.gatherCd>0)return;
-  const p=this.game.player;this.gatherCd=.18;const tool=p.equipment.tool;const cost=tool==="crude_tool"?1.5:tool==="hand_axe"?1.25:2;if(p.energy<cost){this.game.ui.toast("Enerjin az.");return}
+  const p=this.game.player;this.gatherCd=.18;const tool=p.equipment.tool;const cost=tool==="crude_tool"?1.5:tool==="hand_axe"?1.25:tool==="iron_tool"||tool==="iron_axe"?1:2;if(p.energy<cost){this.game.ui.toast("Enerjin az.");return}
   let id="stone",gain=1;
-  if(r.type==="branch"){id="branch";gain=1+(Math.random()<.35?1:0)+(tool==="hand_axe"?1:0)}
+  if(r.type==="branch"){id="branch";gain=1+(Math.random()<.35?1:0)+(tool==="hand_axe"||tool==="iron_axe"?1:0)+(tool==="iron_axe"&&Math.random()<.3?1:0)}
   if(r.type==="fiber"){id="fiber";gain=1}
   if(r.type==="reed"){id="reed";gain=1}
   if(r.type==="bloom"){id="astral_dust";gain=tool==="astral_compass"?2:1}
-  if(r.type==="rock"){id=Math.random()<.18?"flint":"stone";gain=tool==="crude_tool"?2:1}
+  if(r.type==="rock"){id=Math.random()<.18?"flint":"stone";gain=tool==="crude_tool"||tool==="iron_tool"?2:1;if(tool==="iron_tool"&&Math.random()<.35)gain++}
   if(r.type==="crystal"){id=Math.random()<.22?"echo_shard":"crystal";gain=1+(this.game.world.echoLevel>=2?1:0)+(tool==="resonance_lens"?1:0)}
   if(r.type==="star_fragment"){id="star_fragment";gain=tool==="resonance_lens"?2:1}
   p.addItem(id,gain);
