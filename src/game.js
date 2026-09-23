@@ -90,6 +90,10 @@ export class Game{
     if(action==="inventory")this.ui.toggleInventory();
     if(action==="craft")this.ui.toggleCrafting();
     if(action==="map")this.ui.toggleMap();
+    if(action==="quests")this.ui.toggleQuests();
+    if(action==="market")this.ui.toggleMarketplace();
+    if(action==="discoveries")this.ui.toggleDiscoveries();
+    if(action==="guide")this.ui.toggleGuide();
    };
    btn.addEventListener("pointerdown",press);
    btn.addEventListener("contextmenu",e=>e.preventDefault());
