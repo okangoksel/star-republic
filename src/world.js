@@ -24,14 +24,26 @@ regrowResources(){
  drawTree(c,x,y,s=1){c.fillStyle="#5a3b29";c.fillRect(x-4*s,y+8*s,8*s,20*s);c.fillStyle="#28533a";c.fillRect(x-22*s,y-15*s,44*s,28*s);c.fillStyle="#356b45";c.fillRect(x-15*s,y-27*s,30*s,22*s);c.fillStyle="#438052";c.fillRect(x-8*s,y-33*s,16*s,14*s)}
  render(c,w,h,p){
   this.screenOffsetX=w/2-p.x;this.screenOffsetY=h/2-p.y;c.save();c.translate(this.screenOffsetX,this.screenOffsetY);
-  c.fillStyle="#466f47";c.fillRect(0,0,this.width,this.height);
+  c.fillStyle="#4f7549";c.fillRect(0,0,this.width,this.height);
+  // layered pixel terrain texture
+  for(let y=0;y<this.height;y+=24)for(let x=0;x<this.width;x+=24){
+   c.fillStyle=((x/24+y/24)%2===0)?"#557c4e":"#52784b";c.fillRect(x,y,24,24);
+   if((x*13+y*7)%97<22){c.fillStyle="#6f915b";c.fillRect(x+5,y+7,3,3);c.fillRect(x+16,y+15,2,2)}
+  }
   // original region palette and landmarks
   c.fillStyle="#709b61";c.fillRect(70,120,700,560);
   c.fillStyle="#638c57";c.fillRect(0,0,this.width,90);
   c.fillStyle="#5b7f50";c.fillRect(0,90,this.width,8);
+  // natural river, pond and shoreline
+  c.fillStyle="#315f68";c.fillRect(690,105,390,165);c.fillRect(720,250,44,440);
+  c.fillStyle="#5798a4";c.fillRect(698,112,374,151);c.fillRect(728,255,28,425);
+  c.fillStyle="#8dbb9a";c.fillRect(684,100,402,7);c.fillRect(714,245,56,7);
+  c.fillStyle="#74aeb5";for(let x=710;x<1060;x+=54){c.fillRect(x,150+(x%5)*7,24,3);c.fillRect(x+18,220-(x%4)*8,15,2)}
   // river / ponds
-  c.fillStyle="#568da0";c.fillRect(690,110,380,150);c.fillRect(720,260,38,420);
+  
   for(let x=705;x<1050;x+=46){c.fillStyle="#78adba";c.fillRect(x,155+(x%3)*8,22,3)}
+  // dirt roads with pixel edges
+  c.fillStyle="#b58d5e";c.fillRect(70,560,1370,52);c.fillRect(690,500,52,430);c.fillStyle="#c9a873";c.fillRect(70,570,1370,28);c.fillRect(702,500,28,430);
   // village plaza and roads
   c.fillStyle="#c7a66e";c.fillRect(760,420,430,90);c.fillRect(920,300,90,310);
   c.fillStyle="#d6bc83";c.fillRect(1080,90,580,300);
@@ -46,10 +58,14 @@ regrowResources(){
   c.fillStyle="#b26d4c";c.fillRect(330,135,110,65);c.fillStyle="#5b3940";c.fillRect(320,128,130,18);c.fillStyle="#e6cf9d";c.fillRect(370,166,28,34);
   c.fillStyle="#6d8a4f";c.fillRect(1360,475,90,55);c.fillStyle="#5a3b29";c.fillRect(1400,470,10,55);c.fillStyle="#83a75a";c.fillRect(1370,450,70,30);c.fillStyle="#8c5b3e";c.fillRect(1130,150,120,90);c.fillStyle="#5d3e35";c.fillRect(1120,140,140,20);c.fillStyle="#d5bb7b";c.fillRect(1175,190,28,50);
   c.fillStyle="#7b523b";c.fillRect(940,340,120,72);c.fillStyle="#4e3840";c.fillRect(930,330,140,18);
+  // locked region entrances
+  c.fillStyle="#765238";c.fillRect(1240,360,150,16);c.fillStyle="#a98252";c.fillRect(1250,347,12,29);c.fillRect(1378,347,12,29);
+  c.fillStyle="#765238";c.fillRect(1450,390,16,120);c.fillStyle="#a98252";c.fillRect(1437,398,42,10);
+  c.fillStyle="#765238";c.fillRect(1190,720,150,16);c.fillStyle="#a98252";c.fillRect(1200,707,12,29);c.fillRect(1320,707,12,29);
   // trees framing the wilderness
   for(let x=1260;x<1480;x+=55)for(let y=130;y<360;y+=62)this.drawTree(c,x+(y%3)*7,y,0.85);
   for(let x=100;x<680;x+=75)this.drawTree(c,x,760+(x%4)*15,0.8);
-  c.fillStyle="#ead39a";c.font="bold 18px system-ui";c.fillText("HOME FIELD",180,190);c.fillText("VILLAGE",1085,112);c.fillText("WOODLAND",1300,155);c.fillText("DEEP MINE",1540,445);c.fillText("MINE ECHO",1565,675);c.fillText("OLD GROVE",1350,510);
+  c.fillStyle="#ead39a";c.font="bold 18px system-ui";c.fillText("HOME FIELD",180,190);c.fillText("VILLAGE",1085,112);c.fillText("WOODLAND",1300,155);c.fillText("DEEP MINE",1540,445);c.fillText("MINE ECHO",1565,675);c.fillText("OLD GROVE",1350,510);c.fillText("✦ KİLİTLİ: YANKI ORMANI",1245,340);c.fillText("✦ KİLİTLİ: KRİSTAL MAĞARA",1465,385);c.fillText("✦ KİLİTLİ: YILDIZ ÇAYIRI",1200,700);
   // resource sprites
   for(const r of this.resources){
    if(r.type==="branch"){c.fillStyle="#76502f";c.fillRect(r.x-10,r.y-3,20,6);c.fillRect(r.x-3,r.y-12,6,18)}
@@ -66,6 +82,6 @@ regrowResources(){
   if(this.isNight()){c.fillStyle="rgba(8,12,30,.58)";c.fillRect(0,0,w,h)}
   if(this.weather==="wind"){c.strokeStyle="rgba(220,235,210,.18)";for(let i=0;i<12;i++){const y=(i*73+this.time*8)%h;c.beginPath();c.moveTo(0,y);c.lineTo(w,y+8);c.stroke()}}
  }
- serialize(){return {time:this.time,day:this.day,resources:this.resources,weather:this.weather,weatherTimer:this.weatherTimer,echoLevel:this.echoLevel,mineDepth:this.mineDepth}}
- restore(s){if(s){this.time=s.time??this.time;this.day=s.day??1;this.resources=s.resources??this.resources;this.weather=s.weather??this.weather;this.weatherTimer=s.weatherTimer??0;this.echoLevel=s.echoLevel??0;this.mineDepth=s.mineDepth??0}}
+ serialize(){return {unlockedRegions:this.unlockedRegions||{},time:this.time,day:this.day,resources:this.resources,weather:this.weather,weatherTimer:this.weatherTimer,echoLevel:this.echoLevel,mineDepth:this.mineDepth}}
+ restore(s){if(s){this.unlockedRegions=s.unlockedRegions||{};this.time=s.time??this.time;this.day=s.day??1;this.resources=s.resources??this.resources;this.weather=s.weather??this.weather;this.weatherTimer=s.weatherTimer??0;this.echoLevel=s.echoLevel??0;this.mineDepth=s.mineDepth??0}}
 }
