@@ -27,7 +27,7 @@ if(canvas){
 
 (async()=>{
   try{
-    const mod=await import("./game.js?v=0.4.0");
+    const mod=await import("./game.js?v=0.4.1");
     const Game=mod.Game;
     const game=new Game(canvas);
     window.starRepublic=game;
