@@ -1,1 +1,2 @@
-Star Republic deployment: 2026-09-22
+STAR REPUBLIC v0.4.2
+Mobile syntax fix consolidated deployment
