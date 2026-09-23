@@ -14,11 +14,11 @@ export class Systems{
       if(crop.watered){crop.growth+=dt*(this.game.world.weather==="rain"?1.35:1);if(crop.growth>=15){crop.state="ready";crop.watered=false}}
     }
   }
-  if(this.game.world.isNight()&&this.lastSpawn>3.8&&this.enemies.length<12){this.spawnZombie();this.lastSpawn=0}
+  if(this.game.world.isNight()&&this.lastSpawn>6&&this.enemies.length<7){this.spawnZombie();this.lastSpawn=0}
   for(const e of this.enemies){const p=this.game.player,dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy)||1;if(d<500){e.x+=dx/d*e.speed*dt;e.y+=dy/d*e.speed*dt}if(d<28&&e.cd<=0){p.hp=Math.max(0,p.hp-e.damage);e.cd=1;this.game.ui.toast("Dikkat!");if(p.hp<=0){p.hp=p.maxHp;p.energy=Math.max(0,p.energy-25);p.x=390;p.y=360;this.game.ui.toast("Bayıldın! Eve döndün.")}}e.cd=Math.max(0,e.cd-dt)}
   this.particles=this.particles.filter(x=>(x.life-=dt)>0);
  }
- spawnZombie(){const p=this.game.player,a=Math.random()*Math.PI*2,d=280+Math.random()*250;this.enemies.push({type:ENEMIES[Math.floor(Math.random()*ENEMIES.length)],x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,hp:35,speed:Math.random()<.25?95:65,damage:7,cd:0})}
+ spawnZombie(){const p=this.game.player,a=Math.random()*Math.PI*2,d=280+Math.random()*250;this.enemies.push({type:ENEMIES[Math.floor(Math.random()*ENEMIES.length)],x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,hp:20,speed:Math.random()<.2?88:60,damage:5,cd:0})}
  handStrike(){this.attackAt(this.game.mouse.x-this.game.world.screenOffsetX,this.game.mouse.y-this.game.world.screenOffsetY,3,"Tokat");}
  hit(x,y,dmg){
   this.attackAt(x,y,dmg,"Vuruş");
