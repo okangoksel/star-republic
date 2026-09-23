@@ -134,3 +134,4 @@ renderHotbar(){
   el.onclick=e=>{if(e.target.classList.contains("close")||e.target===el)el.classList.add("hidden")};
   el.querySelector("#craft-button").onclick=()=>{if(craft(this.game,selected))draw();};
  }
+}
