@@ -8,7 +8,7 @@ export class Player{
   this.level=1;this.xp=0;this.gold=0;this.attackPower=3;this.defense=0;
   this.hotbar=0;this.attackCd=0;this.attackAnim=0;this.attackAngle=0;
   this.inventory={field_book:1};this.inventoryOrder=["field_book"];this.equipment={weapon:null,tool:null,armor:null};
-  this.discoveries={hands:true};this.resonance=0;this.walkTime=0;this.facing=1;this.inventoryApi=new Inventory(this);
+  this.discoveries={hands:true};this.resonance=0;this.tutorialStep=0;this.tutorialRewards={};this.walkTime=0;this.facing=1;this.inventoryApi=new Inventory(this);
  }
  update(dt){
   const k=this.game.keys,t=this.game.touchMove||{x:0,y:0};
@@ -81,7 +81,7 @@ export class Player{
   c.restore();
  }
  serialize(){
-  return {x:this.x,y:this.y,maxHp:this.maxHp,hp:this.hp,maxEnergy:this.maxEnergy,energy:this.energy,level:this.level,xp:this.xp,gold:this.gold,attackPower:this.attackPower,defense:this.defense,hotbar:this.hotbar,inventory:this.inventory,inventoryOrder:this.inventoryOrder,equipment:this.equipment,discoveries:this.discoveries,resonance:this.resonance};
+  return {x:this.x,y:this.y,maxHp:this.maxHp,hp:this.hp,maxEnergy:this.maxEnergy,energy:this.energy,level:this.level,xp:this.xp,gold:this.gold,attackPower:this.attackPower,defense:this.defense,hotbar:this.hotbar,inventory:this.inventory,inventoryOrder:this.inventoryOrder,equipment:this.equipment,discoveries:this.discoveries,resonance:this.resonance,tutorialStep:this.tutorialStep,tutorialRewards:this.tutorialRewards};
  }
  restore(s){
   if(!s)return;
@@ -94,7 +94,7 @@ export class Player{
   Object.keys(this.inventory).forEach(id=>{if(!this.inventoryOrder.includes(id))this.inventoryOrder.push(id)});
   if(!this.inventory.field_book){this.inventory.field_book=1;this.inventoryOrder.push("field_book");}
   this.equipment=s.equipment||{weapon:null,tool:null,armor:null};
-  this.discoveries=s.discoveries||{hands:true};this.resonance=s.resonance??0;
+  this.discoveries=s.discoveries||{hands:true};this.resonance=s.resonance??0;this.tutorialStep=s.tutorialStep??0;this.tutorialRewards=s.tutorialRewards||{};
   this.inventoryApi=new Inventory(this);
  }
 }
