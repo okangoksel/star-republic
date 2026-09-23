@@ -21,7 +21,7 @@ export class Systems{
  }
  spawnZombie(){const p=this.game.player,a=Math.random()*Math.PI*2,d=280+Math.random()*250;this.enemies.push({type:ENEMIES[Math.floor(Math.random()*ENEMIES.length)],x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,hp:20,speed:Math.random()<.2?88:60,damage:5,cd:0})}
  spawnDawnWave(){const n=3+Math.floor(Math.random()*3);for(let i=0;i<n;i++)this.spawnZombie();this.game.ui.toast("Şafak baskını! Gece kalan zombiler geri döndü.");}
- handStrike(){this.attackAt(this.game.mouse.x-this.game.world.screenOffsetX,this.game.mouse.y-this.game.world.screenOffsetY,3,"Tokat");}
+ handStrike(x=null,y=null){const p=this.game.player;const wx=x??(this.game.mouse.x-this.game.world.screenOffsetX),wy=y??(this.game.mouse.y-this.game.world.screenOffsetY);this.attackAt(wx,wy,p.attackPower,"Tokat");}
  hit(x,y,dmg){
   this.attackAt(x,y,dmg,"Vuruş");
  }
@@ -31,12 +31,12 @@ export class Systems{
  }
  sleepOrInstallBed(){
   const p=this.game.player,w=this.game.world;
-  const nearBed=Math.hypot(p.x-390,p.y-168)<75;
+  const bx=w.bedX??390,by=w.bedY??168;const nearBed=Math.hypot(p.x-bx,p.y-by)<75;
   if(!nearBed)return false;
   if(!w.bedInstalled){
-   if((p.inventory.bed||0)<1){this.game.ui.toast("Önce C ile Yatak üretmelisin.");return true}
-   if(w.isNight()){p.removeItem("bed",1);w.bedInstalled=true;this.game.ui.toast("Yatak kuruldu. E ile uyuyabilirsin.");this.game.save();this.sleepAtBed();return true}
-   p.removeItem("bed",1);w.bedInstalled=true;this.game.ui.toast("Yatak eve yerleştirildi.");this.game.save();return true;
+   if((p.inventory.bed||0)<1)return false;
+   if(!w.inFarm(p.x,p.y)){this.game.ui.toast("Yatağı sadece ev/tarla alanına yerleştirebilirsin.");return true}
+   p.removeItem("bed",1);w.bedInstalled=true;w.bedX=p.x;w.bedY=p.y;this.game.ui.toast("Yatak yerleştirildi. Gece yatağın yanında E ile uyu.");this.game.save();return true;
   }
   if(w.isNight()){this.sleepAtBed();return true}
   this.game.ui.toast("Yatak gece kullanılabilir.");
@@ -141,7 +141,7 @@ gather(r){
   for(const s of this.farmSlots){c.fillStyle="#765337";c.fillRect(s.x-18,s.y-18,36,36);if(s.state==="growing"){c.fillStyle="#5fae52";const h=8+Math.min(18,s.growth);c.fillRect(s.x-3,s.y+7-h,6,h)}if(s.state==="ready"){c.fillStyle="#d8b94e";c.fillRect(s.x-7,s.y-13,14,22)}}
   for(const e of this.enemies){c.fillStyle="#4a8a52";c.fillRect(e.x-12,e.y-12,24,24);c.fillStyle="#111";c.fillRect(e.x-7,e.y-4,4,4);c.fillRect(e.x+3,e.y-4,4,4);c.fillStyle="#8b2d2d";c.fillRect(e.x-12,e.y-19,24,4)}
   for(const q of this.particles){c.fillStyle="#fff";c.font="bold 14px system-ui";c.fillText(q.text,q.x,q.y-(1-q.life)*35)}
-  if(this.game.world.bedInstalled){c.fillStyle="#6b4b33";c.fillRect(372,150,36,12);c.fillStyle="#d9c6a5";c.fillRect(378,143,24,12);c.fillStyle="#8aa4c4";c.fillRect(378,143,24,5);}
+  if(this.game.world.bedInstalled){const bx=this.game.world.bedX??390,by=this.game.world.bedY??168;c.fillStyle="#6b4b33";c.fillRect(bx-18,by-6,36,12);c.fillStyle="#d9c6a5";c.fillRect(bx-12,by-13,24,12);c.fillStyle="#8aa4c4";c.fillRect(bx-12,by-13,24,5);}
   const p=this.game.player;let hint="";let hd=60;
   for(const r of this.game.world.resources){const d=Math.hypot(p.x-r.x,p.y-r.y);if(d<hd){hd=d;hint=r.type==="bloom"?"✦ Astral Bloom · E keşfet":"E · Kaynak topla"}}
   const npc=nearestNPC(p);if(npc){hint="E · "+npc.name+" ile konuş";hd=0}
