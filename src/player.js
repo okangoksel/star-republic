@@ -18,6 +18,7 @@ export class Player{
    const l=Math.hypot(dx,dy);dx/=l;dy/=l;
    this.x+=dx*this.speed*dt;this.y+=dy*this.speed*dt;this.walkTime+=dt*9;
    if(Math.abs(dx)>.15)this.facing=dx>0?1:-1;
+   else if(this.game.mouse){const worldMouseX=this.game.mouse.x-this.game.world.screenOffsetX;if(Math.abs(worldMouseX-this.x)>8)this.facing=worldMouseX>this.x?1:-1;}
   }else this.walkTime=0;
   this.x=Math.max(34,Math.min(this.game.world.width-34,this.x));
   this.y=Math.max(34,Math.min(this.game.world.height-34,this.y));
