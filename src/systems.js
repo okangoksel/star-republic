@@ -72,6 +72,8 @@ export class Systems{
   if(this.sleepOrInstallBed())return;
   const p=this.game.player;const npc=nearestNPC(p);if(npc){if(npc.id==="mira")this.settlementInteract();else this.game.ui.npc(npc);return}
   if(this.tryHiddenDiscovery())return;
+  let tree=null,treeDist=999;for(const t of this.game.world.trees||[]){const d=Math.hypot(p.x-t.x,p.y-t.y);if(d<52&&d<treeDist&&t.hp>0){tree=t;treeDist=d}}
+  if(tree){this.chopTree(tree);return;}
   let near=null,dist=999;
   for(const r of this.game.world.resources){const d=Math.hypot(p.x-r.x,p.y-r.y);if(d<45&&d<dist){near=r;dist=d}}
   if(near){this.gather(near);return}
@@ -102,6 +104,14 @@ exploreGrove(){
   p.energy-=5;p.addItem("wood",1+Math.floor(Math.random()*2));p.addItem("fiber",1);if(Math.random()<.25)p.addItem("reed",1);p.gainXp(8);
   if(!p.discoveries.grove){p.discoveries.grove=true;this.game.ui.toast("Keşif: Eski Korunun içinde düzenli büyüyen yabani bitkiler var.")}else this.game.ui.toast("Korudan kullanılabilir malzeme buldun.");this.game.save();
 }
+chopTree(t){
+  const p=this.game.player,tool=p.equipment.tool;
+  if(!tool||!tool.includes("axe")){this.game.ui.toast("Ağaç için Balta kuşanmalısın. C ile Lif Bağlı Keski üret.");return true}
+  const cost=tool==="hand_axe"?2:1.5;if(p.energy<cost){this.game.ui.toast("Balta kullanacak enerjin yok.");return true}
+  t.hp--;p.energy-=cost;const wood=tool==="iron_axe"?2+Math.floor(Math.random()*2):1+Math.floor(Math.random()*2);p.addItem("wood",wood);p.addItem("branch",1);p.gainXp(8);
+  this.game.ui.toast(t.hp>0?"Ağaca vurdun. Kütükte "+t.hp+" darbe kaldı.":"Ağaç kesildi. +"+wood+" odun");
+  if(t.hp<=0)this.game.save();return true;
+ }
 gather(r){
   if(this.gatherCd>0)return;
   const p=this.game.player;this.gatherCd=.18;const tool=p.equipment.tool;const cost=tool==="crude_tool"?1.5:tool==="hand_axe"?1.25:tool==="iron_tool"||tool==="iron_axe"?1:2;if(p.energy<cost){this.game.ui.toast("Enerjin az.");return}
@@ -138,7 +148,7 @@ gather(r){
   if(Math.hypot(p.x-1610,p.y-650)<75)hint="E · Madeni keşfet";
   if(Math.hypot(p.x-1400,p.y-500)<75)hint="E · Eski Koruyu incele";
   if(Math.hypot(p.x-390,p.y-168)<75)hint=this.game.world.bedInstalled?(this.game.world.isNight()?"E · Uyu ve sabaha geç":"Yatak · Gece kullanılabilir"):"E · Yatağı yerleştir";
-  if(hint){c.setTransform(1,0,0,1,0,0);c.fillStyle="rgba(10,14,20,.82)";c.fillRect(c.canvas.width/2-150,c.canvas.height-92,300,34);c.fillStyle="#fff";c.font="bold 14px system-ui";c.textAlign="center";c.fillText(hint,c.canvas.width/2,c.canvas.height-70);c.textAlign="left"}
+  for(const t of this.game.world.trees||[]){if(t.hp>0){const d=Math.hypot(p.x-t.x,p.y-t.y);if(d<hd){hd=d;hint=p.equipment.tool?.includes("axe")?"E · Ağacı kes":"E · Balta gerekli"}}}\n  if(hint){c.setTransform(1,0,0,1,0,0);c.fillStyle="rgba(10,14,20,.82)";c.fillRect(c.canvas.width/2-150,c.canvas.height-92,300,34);c.fillStyle="#fff";c.font="bold 14px system-ui";c.textAlign="center";c.fillText(hint,c.canvas.width/2,c.canvas.height-70);c.textAlign="left"}
   c.restore();
  }
 }
