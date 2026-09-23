@@ -20,6 +20,19 @@ export class Player{
    if(Math.abs(dx)>.15)this.facing=dx>0?1:-1;
    else if(this.game.mouse){const worldMouseX=this.game.mouse.x-this.game.world.screenOffsetX;if(Math.abs(worldMouseX-this.x)>8)this.facing=worldMouseX>this.x?1:-1;}
   }else this.walkTime=0;
+  // Region gates: progress must unlock new areas.
+  const q=this.game.quests?.done||{}, inv=this.inventory;
+  const gates=[
+   {key:"echoWood",x1:1235,x2:1395,y1:325,y2:390,ok:!!q.bloom&&this.resonance>=25,msg:"Yankı Ormanı: İlk Yankı ve 25 Yankı gerekli."},
+   {key:"crystalCave",x1:1430,x2:1490,y1:370,y2:530,ok:!!q.crystal_echo&&!!this.discoveries.deepMine,msg:"Kristal Mağara: Kristal Yankısı ve Maden derinliği gerekli."},
+   {key:"starMeadow",x1:1180,x2:1350,y1:690,y2:755,ok:!!q.rare_crop&&this.resonance>=60,msg:"Yıldız Çayırı: Gökyüzü Bahçesi ve 60 Yankı gerekli."}
+  ];
+  for(const g of gates){
+   if(!g.ok&&this.x>g.x1&&this.x<g.x2&&this.y>g.y1&&this.y<g.y2){
+    this.x=Math.max(g.x1-8,Math.min(g.x2+8,this.x));this.y=g.y1<380?Math.min(g.y2+8,this.y):Math.max(g.y1-8,this.y);
+    if(Math.random()<dt*2)this.game.ui.toast(g.msg);
+   }
+  }
   this.x=Math.max(34,Math.min(this.game.world.width-34,this.x));
   this.y=Math.max(34,Math.min(this.game.world.height-34,this.y));
   this.attackCd=Math.max(0,this.attackCd-dt);
