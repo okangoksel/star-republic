@@ -12,7 +12,7 @@ export class UI{
   this.$("hp").textContent=Math.ceil(p.hp)+"/"+p.maxHp;this.$("energy").textContent=Math.ceil(p.energy)+"/"+p.maxEnergy;const hpFill=this.$("hp-fill");if(hpFill)hpFill.style.width=Math.max(0,Math.min(100,p.hp/p.maxHp*100))
   this.$("level").textContent=p.level;this.$("xp").textContent=Math.floor(p.xp)+"/"+p.level*100;
   this.$("day").textContent=w.day;this.$("time").textContent=this.clock(w.time);this.$("gold").textContent=p.gold;this.$("weather").textContent=this.weatherName(w.weather);this.$("resonance").textContent=Math.floor(p.resonance);
-  this.renderHotbar();this.renderMinimap();if(this.game.debug)this.updateDebug();
+  this.renderHotbar();this.renderMinimap();this.updateTutorial();if(this.game.debug)this.updateDebug();
  }
  clock(m){const h=Math.floor(m/60)%24,mm=Math.floor(m%60);return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0")} weatherName(w){return ({clear:"Açık",rain:"Yağmur",wind:"Rüzgâr",veil:"Yankı Sisi"}[w]||"Açık")}
  renderMinimap(){
