@@ -10,7 +10,9 @@ export class Game{
   this.ctx=canvas.getContext("2d");
   this.ctx.imageSmoothingEnabled=false;
   this.keys=new Set();
-  this.mouse={x:0,y:0,down:false};\n  this.touchMove={x:0,y:0};\n  this.mobile={};
+  this.mouse={x:0,y:0,down:false};
+  this.touchMove={x:0,y:0};
+  this.mobile={};
   this.paused=false;
   this.debug=false;
   this.last=performance.now();
@@ -25,7 +27,7 @@ export class Game{
   addEventListener("keyup",e=>this.keys.delete(e.key.toLowerCase()));
   canvas.addEventListener("mousemove",e=>{this.mouse.x=e.clientX;this.mouse.y=e.clientY});
   canvas.addEventListener("mousedown",e=>{if(e.button===0){this.mouse.down=true;this.player.attack()}});
-  addEventListener("mouseup",e=>{if(e.button===0)this.mouse.down=false});\n  this.setupMobileControls();
+  addEventListener("mouseup",e=>{if(e.button===0)this.mouse.down=false});
 
   this.world=new World();
   this.player=new Player(this);
@@ -35,6 +37,7 @@ export class Game{
   this.systems=new Systems(this);
   this.quests=new QuestSystem(this);
   this.ui=new UI(this);
+  this.setupMobileControls();
   this.load();
  }
 
