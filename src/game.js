@@ -1,10 +1,10 @@
-import {Player} from "./player.js?v=0.3.4";
-import {World} from "./world.js?v=0.3.4";
-import {Systems} from "./systems.js?v=0.3.4";
-import {UI} from "./ui.js?v=0.3.4";
-import {QuestSystem} from "./quests.js?v=0.3.4";
+import {Player} from "./player.js?v=0.4.0";
+import {World} from "./world.js?v=0.4.0";
+import {Systems} from "./systems.js?v=0.4.0";
+import {UI} from "./ui.js?v=0.4.0";
+import {QuestSystem} from "./quests.js?v=0.4.0";
 
-export const GAME_VERSION="0.3.4";
+export const GAME_VERSION="0.4.0";
 
 export class Game{
  constructor(canvas){
