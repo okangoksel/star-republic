@@ -6,6 +6,8 @@ export class Systems{
  update(dt){this.market.refresh();this.gatherCd=Math.max(0,this.gatherCd-dt);
   const beforeDay=this.game.world.day,beforeWeather=this.game.world.weather;this.game.world.update(dt);
   if(this.game.world.day!==beforeDay){this.lastDay=this.game.world.day;this.game.player.energy=this.game.player.maxEnergy;this.game.ui.toast("Yeni gün başladı. Enerjin yenilendi.");this.game.save(true)}
+  if(beforeDay===this.game.world.day&&this.game.world.time>=360&&this.game.world.time<360+dt*3&&!this.game.world.dawnWavePending){this.game.world.dawnWavePending=true;this.spawnDawnWave();}
+  if(this.game.world.time>=360+dt*3)this.game.world.dawnWavePending=false;
   if(this.game.world.weather!==beforeWeather){this.lastWeather=this.game.world.weather;this.game.ui.toast("Hava değişti: "+this.game.ui.weatherName(this.game.world.weather));}this.lastSpawn+=dt;
   if(!this.game.world.isNight())this.game.player.energy=Math.min(this.game.player.maxEnergy,this.game.player.energy+dt*1.2);
   for(const crop of this.farmSlots){
@@ -19,6 +21,7 @@ export class Systems{
   this.particles=this.particles.filter(x=>(x.life-=dt)>0);
  }
  spawnZombie(){const p=this.game.player,a=Math.random()*Math.PI*2,d=280+Math.random()*250;this.enemies.push({type:ENEMIES[Math.floor(Math.random()*ENEMIES.length)],x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,hp:20,speed:Math.random()<.2?88:60,damage:5,cd:0})}
+ spawnDawnWave(){const n=3+Math.floor(Math.random()*3);for(let i=0;i<n;i++)this.spawnZombie();this.game.ui.toast("Şafak baskını! Gece kalan zombiler geri döndü.");}
  handStrike(){this.attackAt(this.game.mouse.x-this.game.world.screenOffsetX,this.game.mouse.y-this.game.world.screenOffsetY,3,"Tokat");}
  hit(x,y,dmg){
   this.attackAt(x,y,dmg,"Vuruş");
