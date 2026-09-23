@@ -34,9 +34,9 @@ export class Systems{
   const bx=w.bedX??390,by=w.bedY??168;const nearBed=Math.hypot(p.x-bx,p.y-by)<75;
   if(!nearBed)return false;
   if(!w.bedInstalled){
-   if((p.inventory.bed||0)<1)return false;
-   if(!w.inFarm(p.x,p.y)){this.game.ui.toast("Yatağı sadece ev/tarla alanına yerleştirebilirsin.");return true}
-   p.removeItem("bed",1);w.bedInstalled=true;w.bedX=p.x;w.bedY=p.y;this.game.ui.toast("Yatak yerleştirildi. Gece yatağın yanında E ile uyu.");this.game.save();return true;
+   if(this.game.ui.selectedInventoryItem!=="bed")return false;
+   if((p.inventory.bed||0)<1){this.game.ui.selectedInventoryItem=null;return false}
+   p.removeItem("bed",1);w.bedInstalled=true;w.bedX=p.x;w.bedY=p.y;this.game.ui.selectedInventoryItem=null;this.game.ui.toast("Yatak yere yerleştirildi. Gece yatağın yanında E ile uyu.");this.game.save();return true;
   }
   if(w.isNight()){this.sleepAtBed();return true}
   this.game.ui.toast("Yatak gece kullanılabilir.");
