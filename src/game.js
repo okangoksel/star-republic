@@ -41,6 +41,76 @@ export class Game{
   this.load();
  }
 
+ setupMobileControls(){
+  const joystick=document.getElementById("joystick");
+  const stick=document.getElementById("stick");
+  const actions=document.getElementById("mobile-actions");
+  if(!joystick||!stick||!actions)return;
+
+  const state={active:false,id:null,cx:0,cy:0,max:42};
+
+  const reset=()=>{
+   state.active=false;
+   state.id=null;
+   this.touchMove.x=0;
+   this.touchMove.y=0;
+   this.keys.delete("w");this.keys.delete("a");this.keys.delete("s");this.keys.delete("d");
+   stick.style.transform="translate(0px,0px)";
+  };
+
+  const update=(clientX,clientY)=>{
+   let dx=clientX-state.cx;
+   let dy=clientY-state.cy;
+   const len=Math.hypot(dx,dy);
+   if(len>state.max){
+    dx=dx/len*state.max;
+    dy=dy/len*state.max;
+   }
+   this.touchMove.x=dx/state.max;
+   this.touchMove.y=dy/state.max;
+   stick.style.transform=`translate(${dx}px,${dy}px)`;
+  };
+
+  joystick.addEventListener("pointerdown",e=>{
+   e.preventDefault();
+   state.active=true;
+   state.id=e.pointerId;
+   const r=joystick.getBoundingClientRect();
+   state.cx=r.left+r.width/2;
+   state.cy=r.top+r.height/2;
+   try{joystick.setPointerCapture(e.pointerId)}catch(_){}
+   update(e.clientX,e.clientY);
+  });
+
+  joystick.addEventListener("pointermove",e=>{
+   if(!state.active||e.pointerId!==state.id)return;
+   e.preventDefault();
+   update(e.clientX,e.clientY);
+  });
+
+  const end=e=>{
+   if(state.id!==null&&e.pointerId!==state.id)return;
+   reset();
+  };
+  joystick.addEventListener("pointerup",end);
+  joystick.addEventListener("pointercancel",end);
+  joystick.addEventListener("lostpointercapture",reset);
+
+  actions.querySelectorAll("button").forEach(btn=>{
+   const action=btn.dataset.action;
+   const press=e=>{
+    e.preventDefault();
+    if(action==="attack")this.player.attack();
+    if(action==="interact")this.systems.interact();
+    if(action==="inventory")this.ui.toggleInventory();
+    if(action==="craft")this.ui.toggleCrafting();
+    if(action==="map")this.ui.toggleMap();
+   };
+   btn.addEventListener("pointerdown",press);
+   btn.addEventListener("contextmenu",e=>e.preventDefault());
+  });
+ }
+
  onKey(e){
   const k=e.key.toLowerCase();
   this.keys.add(k);
