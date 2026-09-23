@@ -71,9 +71,12 @@ gather(r){
   if(r.type==="bloom"){id="astral_dust";gain=tool==="astral_compass"?2:1}
   if(r.type==="rock"){id=Math.random()<.18?"flint":"stone";gain=tool==="crude_tool"||tool==="iron_tool"?2:1;if(tool==="iron_tool"&&Math.random()<.35)gain++}
   if(r.type==="crystal"){id=Math.random()<.22?"echo_shard":"crystal";gain=1+(this.game.world.echoLevel>=2?1:0)+(tool==="resonance_lens"?1:0)}
+  if(r.type==="moonstone"){id="moonstone";gain=tool==="resonance_lens"?2:1}
+  if(r.type==="ancient_relic"){id="ancient_relic";gain=1}
+  if(r.type==="glow_mushroom"){id="glow_mushroom";gain=1+(Math.random()<.25?1:0)}
   if(r.type==="star_fragment"){id="star_fragment";gain=tool==="resonance_lens"?2:1}
   p.addItem(id,gain);
-  const resonanceGain=r.type==="bloom"?12:(r.type==="crystal"?5:(r.type==="star_fragment"?15:(r.type==="rock"?2:1)));
+  const resonanceGain=r.type==="bloom"?12:(r.type==="crystal"?5:(r.type==="star_fragment"?15:(r.type==="moonstone"?7:(r.type==="ancient_relic"?9:(r.type==="rock"?2:1)))));
   p.resonance=Math.min(100,p.resonance+resonanceGain);
   if(r.type==="bloom"){p.discoveries.bloom=true;this.game.world.echoLevel=Math.max(this.game.world.echoLevel,1);this.game.ui.toast("Astral Bloom keşfedildi: dünya senden bir şey saklıyor.")}
   if(p.resonance>=25&&!p.discoveries.resonanceSense){p.discoveries.resonanceSense=true;this.game.ui.toast("Yeni keşif: Yankı Duyusu. Bazı kaynaklar artık farklı davranabilir.")}
