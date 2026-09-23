@@ -13,10 +13,10 @@
 <div class="panel stats"><div class="title">STAR REPUBLIC</div><div>❤️ <span id="hp">100/100</span></div><div id="hp-bar"><div id="hp-fill"></div></div><div>⚡ <span id="energy">100/100</span></div><div>⭐ Lv.<span id="level">1</span> · <span id="xp">0/100</span> XP</div></div>
 <div class="panel world-info"><div>📅 Gün <span id="day">1</span></div><div>🕒 <span id="time">06:00</span></div><div>🌦️ <span id="weather">Açık</span></div><div>✦ <span id="resonance">0</span> yankı</div><div>💰 <span id="gold">0</span></div></div>
 <div id="toast"></div>
-<div id="debug" class="panel debug hidden"></div>
+<div id="debug" class="panel debug hidden"></div><canvas id="minimap" width="180" height="110" aria-label="Mini harita"></canvas>
 </div>
 <div id="hotbar"></div>
-<div id="help">PC: WASD · E etkileşim · Sol tık · I çanta · C üretim · M harita · J görev · P pazar · K keşif · L kitapçık</div>
+<div id="help">PC: WASD · E etkileşim · Sol tık · I çanta · C üretim · M harita · J görev · P pazar · K keşif · L kitapçık</div><div id="version">Star Republic · v0.3.0</div>
 <div id="mobile-controls">
 <div id="joystick"><div id="stick"></div></div>
 <div id="mobile-actions"><button data-action="attack">⚔</button><button data-action="interact">E</button><button data-action="inventory">🎒</button><button data-action="craft">C</button><button data-action="map">M</button></div>
@@ -25,6 +25,6 @@
 <div id="inventory" class="modal hidden"></div>
 <div id="menu" class="modal hidden"><div class="modal-card"><h1>STAR REPUBLIC</h1><p>Hiçbir şeyin yok. Dünyayı okuyup kendi yolunu kur.</p><button id="resume">Devam Et</button><button id="save">Kaydet</button><button id="reset">Yeni Oyun</button></div></div>
 </div>
-<script type="module" src="./src/main.js"></script>
+<script type="module" src="./src/main.js?v=0.3.0"></script>
 </body>
 </html>
