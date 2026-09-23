@@ -31,7 +31,9 @@ export class Systems{
   if(best){best.hp-=dmg;this.particles.push({x:best.x,y:best.y,text:"-"+dmg,life:.6});if(best.hp<=0){this.game.player.addItem("stone",1+Math.floor(Math.random()*2));this.game.player.gainXp(25);this.particles.push({x:best.x,y:best.y,text:"+Taş",life:1});this.enemies.splice(this.enemies.indexOf(best),1);this.game.ui.toast("Tehdit dağıldı. Bir şeyler topladın.")}}
  }
  interact(){
-  const p=this.game.player;const npc=nearestNPC(p);if(npc){this.game.ui.npc(npc);return}let near=null,dist=999;
+  const p=this.game.player;const npc=nearestNPC(p);if(npc){if(npc.id==="mira")this.settlementInteract();else this.game.ui.npc(npc);return}
+  if(this.tryHiddenDiscovery())return;
+  let near=null,dist=999;
   for(const r of this.game.world.resources){const d=Math.hypot(p.x-r.x,p.y-r.y);if(d<45&&d<dist){near=r;dist=d}}
   if(near){this.gather(near);return}
   if(Math.hypot(p.x-1610,p.y-650)<75){this.exploreMine();return}
