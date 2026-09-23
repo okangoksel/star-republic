@@ -51,7 +51,15 @@ regrowResources(){
   // village plaza and roads
   c.fillStyle="#c7a66e";c.fillRect(760,420,430,90);c.fillRect(920,300,90,310);
   c.fillStyle="#d6bc83";c.fillRect(1080,90,580,300);
-  // Echo Forest terrain\n  c.fillStyle="#3f6b49";c.fillRect(1220,180,250,260);\n  c.fillStyle="#527e55";for(let y=190;y<430;y+=34)for(let x=1230;x<1460;x+=46)c.fillRect(x,y,30,18);\n  c.fillStyle="#405d49";c.fillRect(1220,405,250,35);\n  // Crystal Cave approach\n  c.fillStyle="#4b5057";c.fillRect(1420,390,90,160);c.fillStyle="#30343b";c.fillRect(1440,405,50,130);\n  // Star Meadow\n  c.fillStyle="#7e9b61";c.fillRect(1160,755,220,150);c.fillStyle="#9bbd73";for(let i=0;i<55;i++){const x=1170+(i*37)%200,y=765+(i*61)%125;c.fillRect(x,y,3,3)}\n  // mine region
+  // Echo Forest terrain
+  c.fillStyle="#3f6b49";c.fillRect(1220,180,250,260);
+  c.fillStyle="#527e55";for(let y=190;y<430;y+=34)for(let x=1230;x<1460;x+=46)c.fillRect(x,y,30,18);
+  c.fillStyle="#405d49";c.fillRect(1220,405,250,35);
+  // Crystal Cave approach
+  c.fillStyle="#4b5057";c.fillRect(1420,390,90,160);c.fillStyle="#30343b";c.fillRect(1440,405,50,130);
+  // Star Meadow
+  c.fillStyle="#7e9b61";c.fillRect(1160,755,220,150);c.fillStyle="#9bbd73";for(let i=0;i<55;i++){const x=1170+(i*37)%200,y=765+(i*61)%125;c.fillRect(x,y,3,3)}
+  // mine region
   c.fillStyle="#686866";c.fillRect(1500,420,220,500);c.fillStyle="#25292e";c.fillRect(1530,450,160,440);c.fillStyle="#3a302b";c.fillRect(1570,625,80,55);c.fillStyle="#1c2025";c.fillRect(1582,637,56,43);
   // farm
   c.fillStyle="#6b4b33";c.fillRect(this.farm.x,this.farm.y,this.farm.w,this.farm.h);
