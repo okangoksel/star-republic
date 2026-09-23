@@ -10,13 +10,8 @@ function showBootError(err){
   console.error("Star Republic boot error:",err);
 }
 
-window.addEventListener("error",e=>{
-  showBootError(e.error||e.message||"Bilinmeyen JavaScript hatasi");
-});
-
-window.addEventListener("unhandledrejection",e=>{
-  showBootError(e.reason||"Bilinmeyen Promise hatasi");
-});
+window.addEventListener("error",e=>{showBootError(e.error||e.message||"Bilinmeyen JavaScript hatasi");});
+window.addEventListener("unhandledrejection",e=>{showBootError(e.reason||"Bilinmeyen Promise hatasi");});
 
 if(canvas){
   const c=canvas.getContext("2d");
@@ -32,7 +27,7 @@ if(canvas){
 
 (async()=>{
   try{
-    const mod=await import("./game.js?v=0.3.2");
+    const mod=await import("./game.js?v=0.3.3");
     const Game=mod.Game;
     const game=new Game(canvas);
     window.starRepublic=game;
