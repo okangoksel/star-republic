@@ -1,10 +1,12 @@
 import {item} from "./items.js";import {NPCS,nearestNPC,drawNPC} from "./npcs.js";import {Marketplace} from "./marketplace.js";
 const ENEMIES=["zombie","fast_zombie","miner_zombie"];
 export class Systems{
- constructor(game){this.game=game;this.enemies=[];this.particles=[];this.lastSpawn=0;this.farmSlots=[];this.market=new Marketplace(game);this.initFarm()}
+ constructor(game){this.game=game;this.enemies=[];this.particles=[];this.lastSpawn=0;this.gatherCd=0;this.lastDay=game.world.day;this.lastWeather=game.world.weather;this.farmSlots=[];this.market=new Marketplace(game);this.initFarm()}
  initFarm(){for(let y=250;y<490;y+=48)for(let x=185;x<570;x+=48)this.farmSlots.push({x,y,state:"empty",growth:0,watered:false})}
- update(dt){this.market.refresh();
-  this.game.world.update(dt);this.lastSpawn+=dt;
+ update(dt){this.market.refresh();this.gatherCd=Math.max(0,this.gatherCd-dt);
+  const beforeDay=this.game.world.day,beforeWeather=this.game.world.weather;this.game.world.update(dt);
+  if(this.game.world.day!==beforeDay){this.lastDay=this.game.world.day;this.game.player.energy=this.game.player.maxEnergy;this.game.ui.toast("Yeni gün başladı. Enerjin yenilendi.");this.game.save(true)}
+  if(this.game.world.weather!==beforeWeather){this.lastWeather=this.game.world.weather;this.game.ui.toast("Hava değişti: "+this.game.ui.weatherName(this.game.world.weather));}this.lastSpawn+=dt;
   if(!this.game.world.isNight())this.game.player.energy=Math.min(this.game.player.maxEnergy,this.game.player.energy+dt*1.2);
   for(const crop of this.farmSlots){
     if(crop.state==="growing"){
@@ -37,9 +39,10 @@ export class Systems{
      p.addItem(out,2);p.gainXp(18);slot.state="empty";slot.growth=0;slot.watered=false;slot.seed=null;slot.crop=null;this.game.ui.toast(item(out).name+" hasat edildi.");
    }else if(slot.state==="growing"&&!slot.watered&&p.energy>=2){slot.watered=true;p.energy-=2;this.game.ui.toast("Toprak canlandı.")}
    else if(slot.state==="empty"){
+     if(p.energy<2){this.game.ui.toast("Ekim için en az 2 enerji gerekiyor.");return}
      const seeds=["wheat_seed","carrot_seed","potato_seed","tomato_seed","corn_seed","reed_seed"].filter(id=>(p.inventory[id]||0)>0);
      if(!seeds.length){this.game.ui.toast("Önce bir tohum bul veya üret. Çantayı I ile aç.");return}
-     const seed=seeds[0];if(p.removeItem(seed,1)&&p.energy>=2){slot.state="growing";slot.growth=0;slot.watered=true;slot.seed=seed;slot.crop={wheat_seed:"wheat",reed_seed:"wheat",carrot_seed:"carrot",potato_seed:"potato",tomato_seed:"tomato",corn_seed:"corn"}[seed];p.energy-=2;p.gainXp(5);this.game.ui.toast(item(seed).name+" ekildi.");}
+     const seed=seeds[0];if(p.removeItem(seed,1)){slot.state="growing";slot.growth=0;slot.watered=true;slot.seed=seed;slot.crop={wheat_seed:"wheat",reed_seed:"wheat",carrot_seed:"carrot",potato_seed:"potato",tomato_seed:"tomato",corn_seed:"corn"}[seed];p.energy-=2;p.gainXp(5);this.game.ui.toast(item(seed).name+" ekildi.");}
    }else this.game.ui.toast("Bu tarla karesi hazır değil.")
   }
  }
@@ -56,7 +59,8 @@ exploreGrove(){
   if(!p.discoveries.grove){p.discoveries.grove=true;this.game.ui.toast("Keşif: Eski Korunun içinde düzenli büyüyen yabani bitkiler var.")}else this.game.ui.toast("Korudan kullanılabilir malzeme buldun.");this.game.save();
 }
 gather(r){
-  const p=this.game.player;const tool=p.equipment.tool;const cost=tool==="crude_tool"?1.5:tool==="hand_axe"?1.25:2;if(p.energy<cost){this.game.ui.toast("Enerjin az.");return}
+  if(this.gatherCd>0)return;
+  const p=this.game.player;this.gatherCd=.18;const tool=p.equipment.tool;const cost=tool==="crude_tool"?1.5:tool==="hand_axe"?1.25:2;if(p.energy<cost){this.game.ui.toast("Enerjin az.");return}
   let id="stone",gain=1;
   if(r.type==="branch"){id="branch";gain=1+(Math.random()<.35?1:0)+(tool==="hand_axe"?1:0)}
   if(r.type==="fiber"){id="fiber";gain=1}
@@ -78,6 +82,12 @@ gather(r){
   for(const s of this.farmSlots){c.fillStyle="#765337";c.fillRect(s.x-18,s.y-18,36,36);if(s.state==="growing"){c.fillStyle="#5fae52";const h=8+Math.min(18,s.growth);c.fillRect(s.x-3,s.y+7-h,6,h)}if(s.state==="ready"){c.fillStyle="#d8b94e";c.fillRect(s.x-7,s.y-13,14,22)}}
   for(const e of this.enemies){c.fillStyle="#4a8a52";c.fillRect(e.x-12,e.y-12,24,24);c.fillStyle="#111";c.fillRect(e.x-7,e.y-4,4,4);c.fillRect(e.x+3,e.y-4,4,4);c.fillStyle="#8b2d2d";c.fillRect(e.x-12,e.y-19,24,4)}
   for(const q of this.particles){c.fillStyle="#fff";c.font="bold 14px system-ui";c.fillText(q.text,q.x,q.y-(1-q.life)*35)}
+  const p=this.game.player;let hint="";let hd=60;
+  for(const r of this.game.world.resources){const d=Math.hypot(p.x-r.x,p.y-r.y);if(d<hd){hd=d;hint=r.type==="bloom"?"✦ Astral Bloom · E keşfet":"E · Kaynak topla"}}
+  const npc=nearestNPC(p);if(npc){hint="E · "+npc.name+" ile konuş";hd=0}
+  if(Math.hypot(p.x-1610,p.y-650)<75)hint="E · Madeni keşfet";
+  if(Math.hypot(p.x-1400,p.y-500)<75)hint="E · Eski Koruyu incele";
+  if(hint){c.setTransform(1,0,0,1,0,0);c.fillStyle="rgba(10,14,20,.82)";c.fillRect(c.canvas.width/2-150,c.canvas.height-92,300,34);c.fillStyle="#fff";c.font="bold 14px system-ui";c.textAlign="center";c.fillText(hint,c.canvas.width/2,c.canvas.height-70);c.textAlign="left"}
   c.restore();
  }
 }
