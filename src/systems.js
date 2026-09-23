@@ -40,9 +40,9 @@ export class Systems{
    }else if(slot.state==="growing"&&!slot.watered&&p.energy>=2){slot.watered=true;p.energy-=2;this.game.ui.toast("Toprak canlandı.")}
    else if(slot.state==="empty"){
      if(p.energy<2){this.game.ui.toast("Ekim için en az 2 enerji gerekiyor.");return}
-     const seeds=["wheat_seed","carrot_seed","potato_seed","tomato_seed","corn_seed","reed_seed"].filter(id=>(p.inventory[id]||0)>0);
+     const seeds=["wheat_seed","carrot_seed","potato_seed","tomato_seed","corn_seed","starfruit_seed","moonberry_seed","reed_seed"].filter(id=>(p.inventory[id]||0)>0);
      if(!seeds.length){this.game.ui.toast("Önce bir tohum bul veya üret. Çantayı I ile aç.");return}
-     const seed=seeds[0];if(p.removeItem(seed,1)){slot.state="growing";slot.growth=0;slot.watered=true;slot.seed=seed;slot.crop={wheat_seed:"wheat",reed_seed:"wheat",carrot_seed:"carrot",potato_seed:"potato",tomato_seed:"tomato",corn_seed:"corn"}[seed];p.energy-=2;p.gainXp(5);this.game.ui.toast(item(seed).name+" ekildi.");}
+     const seed=seeds[0];if(p.removeItem(seed,1)){slot.state="growing";slot.growth=0;slot.watered=true;slot.seed=seed;slot.crop={wheat_seed:"wheat",reed_seed:"wheat",carrot_seed:"carrot",potato_seed:"potato",tomato_seed:"tomato",corn_seed:"corn",starfruit_seed:"starfruit",moonberry_seed:"moonberry"}[seed];p.energy-=2;p.gainXp(5);this.game.ui.toast(item(seed).name+" ekildi.");}
    }else this.game.ui.toast("Bu tarla karesi hazır değil.")
   }
  }
@@ -67,13 +67,15 @@ gather(r){
   if(r.type==="reed"){id="reed";gain=1}
   if(r.type==="bloom"){id="astral_dust";gain=1}
   if(r.type==="rock"){id=Math.random()<.18?"flint":"stone";gain=tool==="crude_tool"?2:1}
+  if(r.type==="crystal"){id=Math.random()<.22?"echo_shard":"crystal";gain=1+(this.game.world.echoLevel>=2?1:0)}
+  if(r.type==="star_fragment"){id="star_fragment";gain=1}
   p.addItem(id,gain);
-  const resonanceGain=r.type==="bloom"?12:(r.type==="rock"?2:1);
+  const resonanceGain=r.type==="bloom"?12:(r.type==="crystal"?5:(r.type==="star_fragment"?15:(r.type==="rock"?2:1)));
   p.resonance=Math.min(100,p.resonance+resonanceGain);
   if(r.type==="bloom"){p.discoveries.bloom=true;this.game.world.echoLevel=Math.max(this.game.world.echoLevel,1);this.game.ui.toast("Astral Bloom keşfedildi: dünya senden bir şey saklıyor.")}
   if(p.resonance>=25&&!p.discoveries.resonanceSense){p.discoveries.resonanceSense=true;this.game.ui.toast("Yeni keşif: Yankı Duyusu. Bazı kaynaklar artık farklı davranabilir.")}
   if(p.resonance>=60&&!p.discoveries.echoMap){p.discoveries.echoMap=true;this.game.world.echoLevel=2;this.game.ui.toast("Yeni keşif: Yankı Haritası. Dünyanın izleri güçleniyor.")}
-  p.energy=Math.max(0,p.energy-cost);p.gainXp(tool?5:4);
+  p.energy=Math.max(0,p.energy-cost);p.gainXp(r.type==="star_fragment"?30:(tool?5:4));
   r.hp--;if(r.hp<=0)this.game.world.resources.splice(this.game.world.resources.indexOf(r),1);
   this.game.ui.toast(item(id).name+" topladın.");
  }
