@@ -1,11 +1,12 @@
 export class World{
- constructor(){this.width=1800;this.height=1100;this.time=6*60;this.day=1;this.screenOffsetX=0;this.screenOffsetY=0;this.farm={x:120,y:170,w:520,h:390};this.resources=[];this.weather="clear";this.weatherTimer=0;this.echoLevel=0;this.mineDepth=0;this.dawnWavePending=false;this.unlockedRegions={};this.settlement={level:0,upgrades:{}};this.hiddenDiscoveries={groveShrine:false,meteorCrater:false,oldCabin:false};this.bedInstalled=false;this.makeWorld()}
+ constructor(){this.width=1800;this.height=1100;this.time=6*60;this.day=1;this.screenOffsetX=0;this.screenOffsetY=0;this.farm={x:120,y:170,w:520,h:390};this.resources=[];this.weather="clear";this.weatherTimer=0;this.echoLevel=0;this.mineDepth=0;this.dawnWavePending=false;this.unlockedRegions={};this.settlement={level:0,upgrades:{}};this.hiddenDiscoveries={groveShrine:false,meteorCrater:false,oldCabin:false};this.bedInstalled=false;this.trees=[];this.makeWorld()}
  makeWorld(){
   const types=["branch","fiber","rock","reed"];
   const starter=[["branch",335,315],["branch",465,320],["fiber",300,365],["fiber",500,365],["rock",350,425],["rock",455,430],["reed",280,470],["reed",525,465]];
   for(const [type,x,y] of starter)this.resources.push({type,x,y,hp:2});
   for(let i=0;i<92;i++){const x=60+Math.random()*(this.width-120),y=60+Math.random()*(this.height-120);if(this.inFarm(x,y)||Math.hypot(x-390,y-390)<170)continue;this.resources.push({type:types[Math.floor(Math.random()*types.length)],x,y,hp:2+Math.floor(Math.random()*2)})}
   this.resources.push({type:"bloom",x:610,y:410,hp:3,rare:true});
+  this.trees=[{x:610,y:690,hp:3},{x:675,y:760,hp:3},{x:560,y:825,hp:3},{x:430,y:850,hp:3},{x:300,y:820,hp:3},{x:170,y:760,hp:3},{x:650,y:920,hp:3},{x:520,y:955,hp:3},{x:350,y:970,hp:3},{x:190,y:930,hp:3}];
   this.resources.push({type:"crystal",x:1580,y:560,hp:2,rare:true},{type:"crystal",x:1660,y:735,hp:2,rare:true},{type:"star_fragment",x:1490,y:820,hp:1,rare:true});
   // special resources hidden behind progression gates
   for(const [type,x,y] of [["moonstone",1300,430],["moonstone",1360,470],["ancient_relic",1510,500],["ancient_relic",1580,520],["glow_mushroom",1260,790],["glow_mushroom",1320,830],["star_fragment",1400,820]])this.resources.push({type,x,y,hp:2,rare:true});
@@ -19,6 +20,7 @@ export class World{
 }
 rollWeather(){const pool=["clear","rain","wind","veil"];this.weather=pool[(this.day*7+Math.floor(this.time/60))%pool.length]}
 regrowResources(){
+  for(const t of this.trees)t.hp=3;
   const count=Math.min(18,4+Math.floor(this.day/2));
   const types=["branch","fiber","rock","reed"];
   for(let i=0;i<count;i++){const x=80+Math.random()*(this.width-160),y=100+Math.random()*(this.height-200);if(this.inFarm(x,y)||Math.hypot(x-390,y-390)<140||this.resources.some(r=>Math.hypot(r.x-x,r.y-y)<42))continue;this.resources.push({type:types[(i+this.day)%types.length],x,y,hp:2+Math.floor(Math.random()*2)})}
@@ -84,6 +86,6 @@ regrowResources(){
   if(this.isNight()){c.fillStyle="rgba(8,12,30,.58)";c.fillRect(0,0,w,h)}
   if(this.weather==="wind"){c.strokeStyle="rgba(220,235,210,.18)";for(let i=0;i<12;i++){const y=(i*73+this.time*8)%h;c.beginPath();c.moveTo(0,y);c.lineTo(w,y+8);c.stroke()}}
  }
- serialize(){return {unlockedRegions:this.unlockedRegions||{},settlement:this.settlement||{level:0,upgrades:{}},hiddenDiscoveries:this.hiddenDiscoveries||{},time:this.time,day:this.day,resources:this.resources,weather:this.weather,weatherTimer:this.weatherTimer,echoLevel:this.echoLevel,mineDepth:this.mineDepth,bedInstalled:!!this.bedInstalled}}
- restore(s){if(s){this.unlockedRegions=s.unlockedRegions||{};this.settlement=s.settlement||{level:0,upgrades:{}};this.hiddenDiscoveries=s.hiddenDiscoveries||{groveShrine:false,meteorCrater:false,oldCabin:false};this.time=s.time??this.time;this.day=s.day??1;this.resources=s.resources??this.resources;this.weather=s.weather??this.weather;this.weatherTimer=s.weatherTimer??0;this.echoLevel=s.echoLevel??0;this.mineDepth=s.mineDepth??0;this.bedInstalled=!!s.bedInstalled}}
+ serialize(){return {unlockedRegions:this.unlockedRegions||{},settlement:this.settlement||{level:0,upgrades:{}},hiddenDiscoveries:this.hiddenDiscoveries||{},time:this.time,day:this.day,resources:this.resources,weather:this.weather,weatherTimer:this.weatherTimer,echoLevel:this.echoLevel,mineDepth:this.mineDepth,bedInstalled:!!this.bedInstalled,trees:this.trees}}
+ restore(s){if(s){this.unlockedRegions=s.unlockedRegions||{};this.settlement=s.settlement||{level:0,upgrades:{}};this.hiddenDiscoveries=s.hiddenDiscoveries||{groveShrine:false,meteorCrater:false,oldCabin:false};this.time=s.time??this.time;this.day=s.day??1;this.resources=s.resources??this.resources;this.weather=s.weather??this.weather;this.weatherTimer=s.weatherTimer??0;this.echoLevel=s.echoLevel??0;this.mineDepth=s.mineDepth??0;this.bedInstalled=!!s.bedInstalled;if(Array.isArray(s.trees)&&s.trees.length)this.trees=s.trees}}
 }
