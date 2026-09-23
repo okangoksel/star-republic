@@ -5,7 +5,7 @@ export const QUESTS=[
 ];
 export class QuestSystem{
  constructor(game){this.game=game;this.done={}}
- progress(q){const p=this.game.player;return Object.entries(q.need).every(([id,n])=>id==="bloom"?!!p.discoveries.bloom:id==="resonance"?p.resonance>=n:(p.inventory[id]||0)>=n)}
+ progress(q){const p=this.game.player;return Object.entries(q.need).every(([id,n])=>id==="bloom"?!!p.discoveries.bloom:id==="resonance"?p.resonance>=n:id==="mineDepth"?(this.game.world.mineDepth||0)>=n:(p.inventory[id]||0)>=n)}
  claim(q){if(this.done[q.id]||!this.progress(q))return false;this.done[q.id]=true;this.game.player.gold+=q.reward;this.game.player.gainXp(20);this.game.ui.toast(q.name+" tamamlandı: +"+q.reward+" altın");this.game.save();return true}
  serialize(){return this.done}
  restore(s){this.done=s||{}}
