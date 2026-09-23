@@ -14,7 +14,7 @@ export class Game{
   this.ctx.imageSmoothingEnabled=false;
   this.keys=new Set();
   this.mouse={x:innerWidth/2,y:innerHeight/2,down:false};
-  this.touchMove={x:0,y:0};
+  this.touchMove={x:0,y:0};this.attackTouch={x:0,y:0,active:false};
   this.mobile={};
   this.paused=false;
   this.debug=false;
@@ -80,23 +80,24 @@ export class Game{
   joystick.addEventListener("pointercancel",end);
   joystick.addEventListener("lostpointercapture",reset);
 
+  const attackBtn=actions.querySelector('[data-action="attack"]');
+  if(attackBtn){
+   const attackStick=attackBtn.querySelector(".attack-stick");
+   const astate={active:false,id:null,cx:0,cy:0,max:32};
+   const resetAttack=()=>{astate.active=false;astate.id=null;this.attackTouch.x=0;this.attackTouch.y=0;this.attackTouch.active=false;if(attackStick)attackStick.style.transform="translate(0,0)"};
+   const updateAttack=(x,y)=>{let dx=x-astate.cx,dy=y-astate.cy,len=Math.hypot(dx,dy);if(len>astate.max){dx=dx/len*astate.max;dy=dy/len*astate.max}this.attackTouch.x=dx/astate.max;this.attackTouch.y=dy/astate.max;this.attackTouch.active=true;if(attackStick)attackStick.style.transform=`translate(${dx}px,${dy}px)`};
+   attackBtn.addEventListener("pointerdown",e=>{e.preventDefault();astate.active=true;astate.id=e.pointerId;const r=attackBtn.getBoundingClientRect();astate.cx=r.left+r.width/2;astate.cy=r.top+r.height/2;try{attackBtn.setPointerCapture(e.pointerId)}catch(_){}updateAttack(e.clientX,e.clientY)});
+   attackBtn.addEventListener("pointermove",e=>{if(!astate.active||e.pointerId!==astate.id)return;e.preventDefault();updateAttack(e.clientX,e.clientY)});
+   const endAttack=e=>{if(astate.id!==null&&e.pointerId!==astate.id)return;if(astate.active&&Math.hypot(this.attackTouch.x,this.attackTouch.y)>.18)this.player.attack(this.attackTouch.x,this.attackTouch.y);resetAttack()};
+   attackBtn.addEventListener("pointerup",endAttack);attackBtn.addEventListener("pointercancel",endAttack);attackBtn.addEventListener("lostpointercapture",resetAttack);
+  }
   actions.querySelectorAll("button").forEach(btn=>{
-   const action=btn.dataset.action;
+   const action=btn.dataset.action;if(action==="attack")return;
    const press=e=>{
-    e.preventDefault();
-    if(!this.player||!this.systems||!this.ui)return;
-    if(action==="attack")this.player.attack();
-    if(action==="interact")this.systems.interact();
-    if(action==="inventory")this.ui.toggleInventory();
-    if(action==="craft")this.ui.toggleCrafting();
-    if(action==="map")this.ui.toggleMap();
-    if(action==="quests")this.ui.toggleQuests();
-    if(action==="market")this.ui.toggleMarketplace();
-    if(action==="discoveries")this.ui.toggleDiscoveries();
-    if(action==="guide")this.ui.toggleGuide();
+    e.preventDefault();if(!this.player||!this.systems||!this.ui)return;
+    if(action==="interact")this.systems.interact();if(action==="inventory")this.ui.toggleInventory();if(action==="craft")this.ui.toggleCrafting();if(action==="map")this.ui.toggleMap();if(action==="quests")this.ui.toggleQuests();if(action==="market")this.ui.toggleMarketplace();if(action==="discoveries")this.ui.toggleDiscoveries();if(action==="guide")this.ui.toggleGuide();
    };
-   btn.addEventListener("pointerdown",press);
-   btn.addEventListener("contextmenu",e=>e.preventDefault());
+   btn.addEventListener("pointerdown",press);btn.addEventListener("contextmenu",e=>e.preventDefault());
   });
  }
 
