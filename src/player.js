@@ -43,13 +43,16 @@ export class Player{
   this.attackAnim=Math.max(0,this.attackAnim-dt);
   if(!this.game.world.isNight()&&this.hp>0)this.hp=Math.min(this.maxHp,this.hp+dt*.04);
  }
- attack(){
+ attack(dirX=null,dirY=null){
   if(this.attackCd>0||!this.game.systems)return;
   this.attackAnim=.22;
-  const m=this.game.mouse,wx=m.x-this.game.world.screenOffsetX,wy=m.y-this.game.world.screenOffsetY;
+  const m=this.game.mouse;
+  const mobileDir=dirX!==null&&dirY!==null&&Math.hypot(dirX,dirY)>.01;
+  const wx=mobileDir?this.x+dirX*70:m.x-this.game.world.screenOffsetX;
+  const wy=mobileDir?this.y+dirY*70:m.y-this.game.world.screenOffsetY;
   this.attackAngle=Math.atan2(wy-this.y,wx-this.x);
   const weapon=this.equipment.weapon?item(this.equipment.weapon):null;
-  if(!weapon){this.attackCd=.75;this.game.systems.handStrike();return}
+  if(!weapon){this.attackCd=.75;this.game.systems.handStrike(wx,wy);return}
   this.attackCd=.48;this.game.systems.hit(wx,wy,weapon.damage??this.attackPower);
  }
  gainXp(n){
