@@ -7,7 +7,7 @@ export class Player{
   this.maxHp=100;this.hp=100;this.maxEnergy=100;this.energy=100;
   this.level=1;this.xp=0;this.gold=0;this.attackPower=3;this.defense=0;
   this.hotbar=0;this.attackCd=0;this.attackAnim=0;this.attackAngle=0;
-  this.inventory={field_book:1};this.equipment={weapon:null,tool:null,armor:null};
+  this.inventory={field_book:1};this.inventoryOrder=["field_book"];this.equipment={weapon:null,tool:null,armor:null};
   this.discoveries={hands:true};this.resonance=0;this.walkTime=0;this.facing=1;this.inventoryApi=new Inventory(this);
  }
  update(dt){
@@ -63,7 +63,7 @@ export class Player{
   c.restore();
  }
  serialize(){
-  return {x:this.x,y:this.y,maxHp:this.maxHp,hp:this.hp,maxEnergy:this.maxEnergy,energy:this.energy,level:this.level,xp:this.xp,gold:this.gold,attackPower:this.attackPower,defense:this.defense,hotbar:this.hotbar,inventory:this.inventory,equipment:this.equipment,discoveries:this.discoveries,resonance:this.resonance};
+  return {x:this.x,y:this.y,maxHp:this.maxHp,hp:this.hp,maxEnergy:this.maxEnergy,energy:this.energy,level:this.level,xp:this.xp,gold:this.gold,attackPower:this.attackPower,defense:this.defense,hotbar:this.hotbar,inventory:this.inventory,inventoryOrder:this.inventoryOrder,equipment:this.equipment,discoveries:this.discoveries,resonance:this.resonance};
  }
  restore(s){
   if(!s)return;
@@ -72,7 +72,9 @@ export class Player{
   this.level=s.level??this.level;this.xp=s.xp??this.xp;this.gold=s.gold??this.gold;
   this.attackPower=s.attackPower??s.attack??this.attackPower;this.defense=s.defense??this.defense;
   this.hotbar=s.hotbar??this.hotbar;this.inventory=s.inventory||{};
-  if(!this.inventory.field_book)this.inventory.field_book=1;
+  this.inventoryOrder=Array.isArray(s.inventoryOrder)?s.inventoryOrder.filter(id=>this.inventory[id]>0):[];
+  Object.keys(this.inventory).forEach(id=>{if(!this.inventoryOrder.includes(id))this.inventoryOrder.push(id)});
+  if(!this.inventory.field_book){this.inventory.field_book=1;this.inventoryOrder.push("field_book");}
   this.equipment=s.equipment||{weapon:null,tool:null,armor:null};
   this.discoveries=s.discoveries||{hands:true};this.resonance=s.resonance??0;
   this.inventoryApi=new Inventory(this);
