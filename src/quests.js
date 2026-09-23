@@ -1,7 +1,7 @@
 export const QUESTS=[
 {id:"first_materials",name:"Boş Eller",text:"Dal, lif ve taş topla.",need:{branch:2,fiber:2,stone:2},reward:25},
 {id:"first_seed",name:"Toprağın Sesi",text:"Yabani saplardan Buğday Tohumu üret.",need:{wheat_seed:1},reward:35},
-{id:"bloom",name:"İlk Yankı",text:"Astral Bloom'u keşfet.",need:{bloom:true},reward:75},{id:"resonance_25",name:"Dünyanın Fısıltısı",text:"25 Yankı biriktir.",need:{resonance:25},reward:60},{id:"resonance_60",name:"İzlerin Haritası",text:"60 Yankı biriktir.",need:{resonance:60},reward:120}
+{id:"bloom",name:"İlk Yankı",text:"Astral Bloom'u keşfet.",need:{bloom:true},reward:75},{id:"resonance_25",name:"Dünyanın Fısıltısı",text:"25 Yankı biriktir.",need:{resonance:25},reward:60},{id:"resonance_60",name:"İzlerin Haritası",text:"60 Yankı biriktir.",need:{resonance:60},reward:120},{id:"rare_crop",name:"Gökyüzü Bahçesi",text:"Yıldız Meyvesi yetiştir.",need:{starfruit:1},reward:180},{id:"crystal_echo",name:"Kristal Yankısı",text:"Bir Yankı Parçası bul.",need:{echo_shard:1},reward:140}
 ];
 export class QuestSystem{
  constructor(game){this.game=game;this.done={}}
