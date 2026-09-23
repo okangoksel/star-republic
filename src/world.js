@@ -1,5 +1,5 @@
 export class World{
- constructor(){this.width=1800;this.height=1100;this.time=6*60;this.day=1;this.screenOffsetX=0;this.screenOffsetY=0;this.farm={x:120,y:170,w:520,h:390};this.resources=[];this.weather="clear";this.weatherTimer=0;this.echoLevel=0;this.mineDepth=0;this.dawnWavePending=false;this.makeWorld()}
+ constructor(){this.width=1800;this.height=1100;this.time=6*60;this.day=1;this.screenOffsetX=0;this.screenOffsetY=0;this.farm={x:120,y:170,w:520,h:390};this.resources=[];this.weather="clear";this.weatherTimer=0;this.echoLevel=0;this.mineDepth=0;this.dawnWavePending=false;this.unlockedRegions={};this.settlement={level:0,upgrades:{}};this.hiddenDiscoveries={groveShrine:false,meteorCrater:false,oldCabin:false};this.makeWorld()}
  makeWorld(){
   const types=["branch","fiber","rock","reed"];
   const starter=[["branch",335,315],["branch",465,320],["fiber",300,365],["fiber",500,365],["rock",350,425],["rock",455,430],["reed",280,470],["reed",525,465]];
@@ -49,7 +49,7 @@ regrowResources(){
   // village plaza and roads
   c.fillStyle="#c7a66e";c.fillRect(760,420,430,90);c.fillRect(920,300,90,310);
   c.fillStyle="#d6bc83";c.fillRect(1080,90,580,300);
-  // mine region
+  // Echo Forest terrain\n  c.fillStyle="#3f6b49";c.fillRect(1220,180,250,260);\n  c.fillStyle="#527e55";for(let y=190;y<430;y+=34)for(let x=1230;x<1460;x+=46)c.fillRect(x,y,30,18);\n  c.fillStyle="#405d49";c.fillRect(1220,405,250,35);\n  // Crystal Cave approach\n  c.fillStyle="#4b5057";c.fillRect(1420,390,90,160);c.fillStyle="#30343b";c.fillRect(1440,405,50,130);\n  // Star Meadow\n  c.fillStyle="#7e9b61";c.fillRect(1160,755,220,150);c.fillStyle="#9bbd73";for(let i=0;i<55;i++){const x=1170+(i*37)%200,y=765+(i*61)%125;c.fillRect(x,y,3,3)}\n  // mine region
   c.fillStyle="#686866";c.fillRect(1500,420,220,500);c.fillStyle="#25292e";c.fillRect(1530,450,160,440);c.fillStyle="#3a302b";c.fillRect(1570,625,80,55);c.fillStyle="#1c2025";c.fillRect(1582,637,56,43);
   // farm
   c.fillStyle="#6b4b33";c.fillRect(this.farm.x,this.farm.y,this.farm.w,this.farm.h);
@@ -84,6 +84,6 @@ regrowResources(){
   if(this.isNight()){c.fillStyle="rgba(8,12,30,.58)";c.fillRect(0,0,w,h)}
   if(this.weather==="wind"){c.strokeStyle="rgba(220,235,210,.18)";for(let i=0;i<12;i++){const y=(i*73+this.time*8)%h;c.beginPath();c.moveTo(0,y);c.lineTo(w,y+8);c.stroke()}}
  }
- serialize(){return {unlockedRegions:this.unlockedRegions||{},time:this.time,day:this.day,resources:this.resources,weather:this.weather,weatherTimer:this.weatherTimer,echoLevel:this.echoLevel,mineDepth:this.mineDepth}}
- restore(s){if(s){this.unlockedRegions=s.unlockedRegions||{};this.time=s.time??this.time;this.day=s.day??1;this.resources=s.resources??this.resources;this.weather=s.weather??this.weather;this.weatherTimer=s.weatherTimer??0;this.echoLevel=s.echoLevel??0;this.mineDepth=s.mineDepth??0}}
+ serialize(){return {unlockedRegions:this.unlockedRegions||{},settlement:this.settlement||{level:0,upgrades:{}},hiddenDiscoveries:this.hiddenDiscoveries||{},time:this.time,day:this.day,resources:this.resources,weather:this.weather,weatherTimer:this.weatherTimer,echoLevel:this.echoLevel,mineDepth:this.mineDepth}}
+ restore(s){if(s){this.unlockedRegions=s.unlockedRegions||{};this.settlement=s.settlement||{level:0,upgrades:{}};this.hiddenDiscoveries=s.hiddenDiscoveries||{groveShrine:false,meteorCrater:false,oldCabin:false};this.time=s.time??this.time;this.day=s.day??1;this.resources=s.resources??this.resources;this.weather=s.weather??this.weather;this.weatherTimer=s.weatherTimer??0;this.echoLevel=s.echoLevel??0;this.mineDepth=s.mineDepth??0}}
 }
