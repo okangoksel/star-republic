@@ -1,5 +1,5 @@
 import {item} from "./items.js";
-export const RECIPES=[
+export const RECIPES=[{id:"bed",category:"Araç",name:"Yatak",description:"Evine yerleştir. Gece yatağın başında E ile uyuyup sabah 06:00'ya geçebilirsin.",ingredients:{wood:8,fiber:4,rope:2},pattern:["wood","wood","wood","fiber","rope","fiber","wood","wood","wood"],result:"bed",amount:1},
 {id:"rope",name:"Lif İpi",description:"Lifleri bükerek bağlama ipi.",ingredients:{fiber:3},pattern:["fiber","fiber","fiber"],result:"rope",amount:1},
 {id:"wheat_seed",category:"Tohum",name:"Buğday Tohumu",description:"Yabani sap ve liften tohum ayır.",ingredients:{reed:2,fiber:1},pattern:["reed","fiber","reed"],result:"wheat_seed",amount:2},
 {id:"watering_can",category:"Araç",name:"Sulama Kabı",description:"İlk tarlaların için basit sulama kabı.",ingredients:{stone:2,branch:2,fiber:2},pattern:["stone","branch","stone","fiber","fiber","fiber"],result:"watering_can",amount:1},
