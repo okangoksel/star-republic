@@ -12,10 +12,25 @@ export class UI{
   this.$("hp").textContent=Math.ceil(p.hp)+"/"+p.maxHp;this.$("energy").textContent=Math.ceil(p.energy)+"/"+p.maxEnergy;const hpFill=this.$("hp-fill");if(hpFill)hpFill.style.width=Math.max(0,Math.min(100,p.hp/p.maxHp*100))
   this.$("level").textContent=p.level;this.$("xp").textContent=Math.floor(p.xp)+"/"+p.level*100;
   this.$("day").textContent=w.day;this.$("time").textContent=this.clock(w.time);this.$("gold").textContent=p.gold;this.$("weather").textContent=this.weatherName(w.weather);this.$("resonance").textContent=Math.floor(p.resonance);
-  this.renderHotbar();if(this.game.debug)this.updateDebug();
+  this.renderHotbar();this.renderMinimap();if(this.game.debug)this.updateDebug();
  }
  clock(m){const h=Math.floor(m/60)%24,mm=Math.floor(m%60);return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0")} weatherName(w){return ({clear:"Açık",rain:"Yağmur",wind:"Rüzgâr",veil:"Yankı Sisi"}[w]||"Açık")}
- renderHotbar(){
+ renderMinimap(){
+  const m=this.$("minimap");if(!m)return;
+  const c=m.getContext("2d");if(!c)return;
+  const w=this.game.world,p=this.game.player,sx=m.width/w.width,sy=m.height/w.height;
+  c.clearRect(0,0,m.width,m.height);
+  c.fillStyle="#263d2b";c.fillRect(0,0,m.width,m.height);
+  c.fillStyle="#5d8b5b";c.fillRect(70*sx,120*sy,700*sx,560*sy);
+  c.fillStyle="#4d7d8e";c.fillRect(690*sx,110*sy,380*sx,150*sy);
+  c.fillStyle="#b59a62";c.fillRect(760*sx,420*sy,430*sx,90*sy);
+  c.fillStyle="#45484a";c.fillRect(1500*sx,420*sy,220*sx,500*sy);
+  c.fillStyle="#8b6547";c.fillRect(120*sx,170*sy,520*sx,390*sy);
+  c.fillStyle="#d7b7ff";c.fillRect(610*sx-2,410*sy-2,4,4);
+  c.fillStyle="#f6d36b";c.fillRect(p.x*sx-2,p.y*sy-2,5,5);
+  c.strokeStyle="rgba(255,255,255,.2)";c.strokeRect(1,1,m.width-2,m.height-2);
+}
+renderHotbar(){
   const el=this.$("hotbar");el.innerHTML="";
   const entries=this.game.player.inventoryApi.entries();
   const ids=entries.map(x=>x.id).slice(0,9);
@@ -27,8 +42,22 @@ export class UI{
  toggleInventory(){const el=this.$("inventory");if(!el.classList.contains("hidden")){el.classList.add("hidden");return}el.classList.remove("hidden");this.renderInventory()}
  renderInventory(){
   const el=this.$("inventory"),p=this.game.player,entries=p.inventoryApi.entries().sort((a,b)=>a.data.type.localeCompare(b.data.type,"tr")||a.data.name.localeCompare(b.data.name,"tr"));
-  el.innerHTML='<div class="modal-card inventory-card"><div class="inv-title"><h2>Çanta</h2><span class="close">I / Kapat</span></div><p class="muted">Eşyalar türüne ve adına göre otomatik düzenlenir.</p><div class="inventory-tools"><button id="sort-inventory">↕ Yeniden Düzenle</button></div><div class="inventory-grid">'+Array.from({length:24},(_,i)=>{const e=entries[i];return '<div class="inv-slot">'+(e?'<b>'+e.data.icon+' '+e.data.name+'</b><span class="qty">x'+e.qty+'</span>':'')+'</div>'}).join("")+'</div><p>💰 '+p.gold+' · Elindeki alet: '+(p.equipment.tool?item(p.equipment.tool).name:"Yok")+' · Silah: '+(p.equipment.weapon?item(p.equipment.weapon).name:"Yok")+'</p></div>';
-  const sortBtn=el.querySelector("#sort-inventory");if(sortBtn)sortBtn.onclick=()=>this.renderInventory();el.onclick=e=>{if(e.target.classList.contains("close")||e.target===el)el.classList.add("hidden")}
+  el.innerHTML='<div class="modal-card inventory-card"><div class="inv-title"><h2>Çanta</h2><span class="close">I / Kapat</span></div><p class="muted">Bir eşyaya tıklayarak uygun bir işlem yapabilirsin.</p><div class="inventory-tools"><button id="sort-inventory">↕ Düzeni Yenile</button></div><div class="inventory-grid">'+Array.from({length:24},(_,i)=>{const e=entries[i];return '<button class="inv-slot" data-item="'+(e?e.id:"")+'" '+(e?"":"disabled")+'>'+(e?'<b>'+e.data.icon+' '+e.data.name+'</b><span class="qty">x'+e.qty+'</span>':'')+'</button>'}).join("")+'</div><p>💰 '+p.gold+' · Alet: '+(p.equipment.tool?item(p.equipment.tool).name:"Yok")+' · Seçili yuva: '+(p.hotbar+1)+'</p></div>';
+  const sortBtn=el.querySelector("#sort-inventory");if(sortBtn)sortBtn.onclick=()=>this.renderInventory();
+  el.querySelectorAll("[data-item]").forEach(b=>b.onclick=()=>this.useInventoryItem(b.dataset.item));
+  el.onclick=e=>{if(e.target.classList.contains("close")||e.target===el)el.classList.add("hidden")}
+ }
+ useInventoryItem(id){
+  if(!id)return;
+  const p=this.game.player,info=item(id);
+  if(info.type==="tool"){p.equipment.tool=id;this.toast(info.name+" kuşanıldı.");this.renderInventory();return}
+  if(info.type==="food"){
+   const before=p.energy;
+   p.energy=Math.min(p.maxEnergy,p.energy+25);
+   if(p.energy>before){p.removeItem(id,1);this.toast(info.name+" kullandın. +"+Math.round(p.energy-before)+" enerji.");this.renderInventory()}
+   return;
+  }
+  p.addItem(id,0);this.toast(info.name+" seçildi.");
  }
  toggleQuests(){const el=this.$("inventory");el.classList.remove("hidden");const qs=this.game.quests;el.innerHTML=`<div class="modal-card inventory-card"><div class="inv-title"><h2>Görevler</h2><span class="close">J / Kapat</span></div>${QUESTS.map(q=>{const done=!!qs.done[q.id],ready=qs.progress(q);return `<button class="recipe" data-quest="${q.id}" ${done||!ready?"disabled":""}><b>${done?"✓ ":""}${q.name}</b><span>${q.text}</span><small>${done?"Tamamlandı":"Ödül: "+q.reward+" altın · "+(ready?"Hazır":"Henüz hazır değil")}</small></button>`}).join("")}</div>`;el.querySelectorAll("[data-quest]").forEach(b=>b.onclick=()=>{const q=QUESTS.find(x=>x.id===b.dataset.quest);qs.claim(q);this.toggleQuests()});el.onclick=e=>{if(e.target.classList.contains("close")||e.target===el)el.classList.add("hidden")}}
  toggleMap(){const el=this.$("inventory");el.classList.remove("hidden");el.innerHTML=`<div class="modal-card inventory-card"><div class="inv-title"><h2>Dünya Haritası</h2><span class="close">M / Kapat</span></div><div class="map-card"><div>🏡 <b>Ev / Tarla</b> · başlangıç bölgesi</div><div>🏘️ <b>Köy</b> · NPC ve pazar</div><div>🌲 <b>Woodland</b> · lif ve yabani kaynaklar</div><div>⛏️ <b>Deep Mine</b> · ileride derinleşecek keşif alanı</div><div>✦ <b>Astral Bloom</b> · ilk büyük gizem</div></div></div>`;el.onclick=e=>{if(e.target.classList.contains("close")||e.target===el)el.classList.add("hidden")}}
