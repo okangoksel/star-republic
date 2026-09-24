@@ -31,6 +31,10 @@ export class Systems{
  }
  sleepOrInstallBed(){
   const p=this.game.player,w=this.game.world;
+  if(!w.bedInstalled&&this.game.ui.selectedInventoryItem==="bed"){
+   if((p.inventory.bed||0)<1){this.game.ui.selectedInventoryItem=null;return true}
+   p.removeItem("bed",1);w.bedInstalled=true;w.bedX=p.x;w.bedY=p.y;this.game.ui.selectedInventoryItem=null;this.game.ui.toast("Yatak yerleştirildi. Gece yatağın yanında E ile uyu.");this.game.save();return true;
+  }
   const bx=w.bedX??390,by=w.bedY??168;const nearBed=Math.hypot(p.x-bx,p.y-by)<75;
   if(!nearBed)return false;
   if(!w.bedInstalled){
