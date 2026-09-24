@@ -1,7 +1,7 @@
 import {Player} from "./player.js?v=0.4.7";
 import {World} from "./world.js?v=0.4.7";
 import {Systems} from "./systems.js?v=0.4.7";
-import {UI} from "./ui.js?v=0.4.5";
+import {UI} from "./ui.js?v=0.4.7";
 import {QuestSystem} from "./quests.js?v=0.4.7";
 
 export const GAME_VERSION="0.4.7";
