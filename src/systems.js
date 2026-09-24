@@ -72,7 +72,8 @@ export class Systems{
   }
   return false;
  }
- settlementInteract(){const mira=NPCS.find(n=>n.id==="mira");if(mira)this.game.ui.npc(mira);}\n interact(){
+ settlementInteract(){const mira=NPCS.find(n=>n.id==="mira");if(mira)this.game.ui.npc(mira);}
+ interact(){
   if(this.sleepOrInstallBed())return;
   const p=this.game.player;const npc=nearestNPC(p);if(npc){if(npc.id==="mira")this.settlementInteract();else this.game.ui.npc(npc);return}
   if(this.tryHiddenDiscovery())return;
